@@ -15,7 +15,7 @@
     if (!grid) return;
     const aircraftList = data.getAircraft();
     grid.innerHTML = aircraftList.map(a => `
-      <article class="aircraft-card">
+      <article class="aircraft-card" style="cursor: pointer;" onclick="window.location.href='aircraft-status.html?reg=${a.registration}'">
         <header><div><h4>${a.registration}</h4><small>${a.model}</small></div><span class="tag ${a.status === 'SERVICEABLE' ? 'serviceable' : a.status === 'DEFERRED' ? 'deferred' : 'aog'}">${a.status}</span></header>
         <div class="plane">✈</div>
         <div class="stats"><div><small>Open Defects</small><b>${a.openDefects}</b></div><div><small>MEL Items</small><b>${a.melItems}</b></div></div>

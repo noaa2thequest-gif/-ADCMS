@@ -41,6 +41,13 @@ if (typeof window !== 'undefined') {
       ADCMSDefectDetails.init();
     }
   }
+  const { ADCMSAircraftStatus } = window;
+  if (ADCMSAircraftStatus && typeof document !== 'undefined') {
+    const shouldInitStatus = document.getElementById('aircraftHeader') || window.location.pathname.includes('aircraft-status.html');
+    if (shouldInitStatus) {
+      ADCMSAircraftStatus.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
