@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — Fleet Overview</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✈</div>
+        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
+      </div>
+      <nav>
+        <a class="active" href="#">⌂ <span>Fleet Overview</span></a>
+        <a href="#">◫ <span>Dashboard</span></a>
+        <a href="#">✈ <span>Aircraft</span></a>
+        <a href="#">▱ <span>Defect Control</span></a>
+        <a href="#">▤ <span>MEL Management</span></a>
+        <a href="#">▣ <span>Cabin Defects</span></a>
+        <a href="#">▥ <span>MCC Center</span></a>
+        <a href="#">◉ <span>Surveillance & SAFA</span></a>
+        <a href="#">▦ <span>Stores & Inventory</span></a>
+        <a href="#">◩ <span>Reports</span></a>
+        <a href="#">♧ <span>Notifications</span><b>8</b></a>
+        <a href="#">⚙ <span>Administration</span></a>
+        <a href="#">▧ <span>Audit Log</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
+        <small>Version 0.2.0 (Build 02)<br>© 2026 ADCMS</small>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <button class="menu" id="menuBtn">☰</button>
+        <div class="profile"><span class="bell">♧<b>8</b></span><div class="avatar">H</div><div><strong>Hany Omar</strong><small>Super Admin</small></div></div>
+      </header>
+
+      <section class="content">
+        <div class="title-row">
+          <div><h2>Fleet Overview</h2><p>Real-time overview of fleet status and maintenance</p></div>
+          <input id="search" placeholder="Search aircraft, tail number, or defect..." />
+        </div>
+
+        <div class="kpis">
+          <article><div class="ico purple">✈</div><div><span>Total Aircraft</span><strong>10</strong><small>Active</small></div></article>
+          <article><div class="ico yellow">▤</div><div><span>Open Defects</span><strong>29</strong><small class="up">↑ 4 vs yesterday</small></div></article>
+          <article><div class="ico red">!</div><div><span>MEL Items</span><strong>8</strong><small class="up">↑ 1 vs yesterday</small></div></article>
+          <article><div class="ico blue">▦</div><div><span>Aircraft On Ground</span><strong>1</strong><small>10% of fleet</small></div></article>
+          <article><div class="ico green">✓</div><div><span>Completed Today</span><strong>12</strong><small class="down">↑ 3 vs yesterday</small></div></article>
+        </div>
+
+        <div class="section-head"><h3>Aircraft Status</h3><a href="#">View all aircraft →</a></div>
+        <div class="aircraft-grid" id="aircraftGrid"></div>
+
+        <div class="bottom-grid">
+          <article class="panel">
+            <h3>Defects by Priority</h3>
+            <div class="donut-wrap"><div class="donut"><span><b>29</b>Total</span></div>
+              <ul><li><i class="d red-dot"></i>AOG <b>4</b></li><li><i class="d orange-dot"></i>High <b>9</b></li><li><i class="d yellow-dot"></i>Medium <b>10</b></li><li><i class="d green-dot"></i>Low <b>6</b></li></ul>
+            </div>
+          </article>
+          <article class="panel">
+            <h3>Recent Activity</h3>
+            <div class="activity"><p><i class="red-bg">⚒</i><span><b>New AOG defect on SU-SKD</b><small>ATA 27 — Flight Controls</small></span><time>10 min ago</time></p>
+            <p><i class="green-bg">✓</i><span><b>Defect closed on SU-SKB</b><small>ATA 21 — Air Conditioning</small></span><time>25 min ago</time></p>
+            <p><i class="purple-bg">▤</i><span><b>MEL item added on SU-SKC</b><small>ATA 23 — Communications</small></span><time>1 hour ago</time></p>
+            <p><i class="blue-bg">✈</i><span><b>Aircraft status updated</b><small>SU-SKE — CAI</small></span><time>2 hours ago</time></p></div>
+          </article>
+          <article class="panel">
+            <h3>Fleet Status Overview</h3>
+            <div class="bars">
+              <label>Serviceable <b>6 (60%)</b></label><div><i style="width:60%"></i></div>
+              <label>Deferred <b>3 (30%)</b></label><div class="amber"><i style="width:30%"></i></div>
+              <label>AOG <b>1 (10%)</b></label><div class="danger"><i style="width:10%"></i></div>
+              <label>In Maintenance <b>0 (0%)</b></label><div class="muted"><i style="width:0%"></i></div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+<script src="app.js"></script>
+</body>
+</html>
