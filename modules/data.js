@@ -145,6 +145,29 @@
       } catch (error) {
         console.error('Error persisting state:', error);
       }
+    },
+
+    checkRepeatDefect(aircraft, issue) {
+      const tenDaysAgo = new Date();
+      tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+      
+      const allDefects = workflowState.defects || [];
+      const history = workflowState.history || [];
+      
+      // Combine active and historical defects for analysis
+      const combined = [...allDefects, ...history];
+      
+      const related = combined.filter(d => 
+        d.aircraft === aircraft && 
+        d.issue.toLowerCase().includes(issue.toLowerCase()) && 
+        new Date(d.reportDate || d.reportedAt) >= tenDaysAgo
+      );
+      
+      return {
+        isRepeat: related.length >= 1,
+        isChronic: related.length >= 3,
+        count: related.length
+      };
     }
   };
 });

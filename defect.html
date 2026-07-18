@@ -3,8 +3,109 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADCMS — Defect Workflow</title>
+  <title>ADCMS — Defect Details</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .defect-header-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--bg-secondary);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      border-left: 5px solid var(--accent);
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-open { background-color: #2196f3; color: white; }
+    .status-waiting { background-color: #ff9800; color: white; }
+    .status-deferred { background-color: #9c27b0; color: white; }
+    .status-closed { background-color: #4caf50; color: white; }
+
+    .action-log {
+      margin-top: 20px;
+    }
+
+    .action-item {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .action-performed {
+      background-color: rgba(76, 175, 80, 0.1);
+      border-left: 4px solid #4caf50;
+    }
+
+    .action-proposed {
+      background-color: rgba(255, 152, 0, 0.1);
+      border-left: 4px solid #ff9800;
+    }
+
+    .action-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .performed-icon { background-color: #4caf50; color: white; }
+    .proposed-icon { background-color: #ff9800; color: white; }
+
+    .action-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    .chronic-alert {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border: 1px solid #ef9a9a;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .spare-parts-card {
+      background-color: var(--bg-secondary);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .countdown-timer {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ff5252;
+      text-align: center;
+      padding: 15px;
+      background: rgba(255, 82, 82, 0.1);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -16,6 +117,8 @@
       <nav>
         <a href="index.html">⌂ <span>Fleet Overview</span></a>
         <a class="active" href="defect.html">▤ <span>Defect Workflow</span></a>
+        <a href="new-defect.html">＋ <span>New Defect</span></a>
+        <a href="mel.html">▤ <span>MEL Management</span></a>
       </nav>
       <div class="sidebar-footer">
         <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
@@ -30,66 +133,81 @@
       </header>
 
       <section class="content">
-        <div class="title-row">
-          <div><h2>Defect Workflow</h2><p id="workflowHeading">Manage repeat-defect detection, troubleshooting history, attachments and closure.</p></div>
-          <div class="title-actions">
-            <a href="new-defect.html" class="new-defect-btn">+ New Defect</a>
-          </div>
+        <!-- Chronic Alert -->
+        <div id="chronicAlert" class="chronic-alert">
+          <span>⚠️ CRITICAL: This is a CHRONIC DEFECT (3rd+ occurrence in 10 days!)</span>
         </div>
 
-        <section class="workflow-section">
-          <article class="panel workflow-panel">
+        <div id="defectHeader" class="defect-header-info">
+          <!-- Populated by JS -->
+          <div>Loading defect details...</div>
+        </div>
+
+        <div class="workflow-grid">
+          <!-- LEFT COLUMN: Action Log -->
+          <div class="workflow-card" style="grid-column: span 2;">
             <div class="section-head">
-              <h3>Defect Workflow</h3>
-              <span id="workflowBadge" class="workflow-badge">Open</span>
+              <h3>Maintenance Action Log</h3>
+              <button id="addActionBtn" class="workflow-btn" style="padding: 4px 12px; font-size: 12px;">+ Add Action</button>
             </div>
-            <div class="workflow-grid">
-              <div class="workflow-card">
-                <h4>Active Defect</h4>
-                <label>Aircraft</label>
-                <input id="workflowAircraft" class="workflow-input" value="SU-SKD" />
-                <label>Defect Title</label>
-                <input id="workflowIssue" class="workflow-input" value="Hydraulic pump noise" />
-                <label>Defect Source</label>
-                <select id="workflowDefectSource" class="workflow-input">
-                  <option>ECAM Message</option>
-                  <option>Failure Message</option>
-                  <option>Captain Entry</option>
-                  <option>Crew Observation</option>
-                  <option>Maintenance Observation</option>
-                  <option>Cabin Defect</option>
-                </select>
-                <label>Troubleshooting Note</label>
-                <textarea id="workflowNote" class="workflow-textarea" rows="3" placeholder="Describe what was inspected or repaired"></textarea>
-                <button id="workflowRecordBtn" class="workflow-btn">Log troubleshooting step</button>
-              </div>
-              <div class="workflow-card">
-                <h4>Repeat Defect Detection</h4>
-                <p id="repeatMessage" class="workflow-hint">Checking for prior occurrences…</p>
-                <ul id="workflowHistory" class="workflow-list"></ul>
-              </div>
-              <div class="workflow-card">
-                <h4>Troubleshooting History</h4>
-                <ul id="workflowSteps" class="workflow-list"></ul>
-              </div>
-              <div class="workflow-card">
-                <h4>Attachments & Closure</h4>
-                <div id="attachmentList" class="chip-row"></div>
-                <input id="workflowAttachment" class="workflow-input" placeholder="Attachment name or reference" />
-                <button id="workflowAttachBtn" class="workflow-btn secondary">Add attachment</button>
-                <label>Root Cause</label>
-                <textarea id="workflowRootCause" class="workflow-textarea" rows="3" placeholder="Document the root cause before closure"></textarea>
-                <button id="workflowCloseBtn" class="workflow-btn danger">Close defect</button>
+            
+            <div id="actionLog" class="action-log">
+              <!-- Actions populated by JS -->
+            </div>
+
+            <!-- Add Action Form (Hidden by default) -->
+            <div id="actionForm" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+              <label>Action Type</label>
+              <select id="actionType" class="workflow-input">
+                <option value="performed">Performed Action (Green)</option>
+                <option value="proposed">Proposed Action (Orange)</option>
+              </select>
+              <label>Description</label>
+              <textarea id="actionDesc" class="workflow-textarea" rows="3" placeholder="What was done or what is needed?"></textarea>
+              <label>Performed By</label>
+              <input id="actionBy" class="workflow-input" placeholder="Name / Staff ID" />
+              <div class="form-actions" style="margin-top: 10px;">
+                <button id="saveActionBtn" class="workflow-btn">Save Action</button>
+                <button id="cancelActionBtn" class="workflow-btn secondary">Cancel</button>
               </div>
             </div>
-          </article>
-        </section>
+          </div>
+
+          <!-- RIGHT COLUMN: MEL & Spares -->
+          <div class="workflow-card">
+            <div id="melTimerContainer" style="display: none;">
+              <div class="section-head"><h3>MEL Countdown</h3></div>
+              <div id="melCountdown" class="countdown-timer">00d 00h 00m</div>
+            </div>
+
+            <div class="section-head"><h3>Spare Parts Tracking</h3></div>
+            <div class="spare-parts-card">
+              <label>Status</label>
+              <select id="sparePartsStatus" class="workflow-input">
+                <option value="no">Not Required</option>
+                <option value="waiting">Waiting for Parts</option>
+                <option value="ordered">Parts Ordered</option>
+                <option value="received">Parts Received</option>
+              </select>
+              <label style="margin-top: 15px;">Required Parts (P/N)</label>
+              <textarea id="requiredParts" class="workflow-textarea" rows="2" placeholder="P/N, Description..."></textarea>
+            </div>
+
+            <div class="section-head" style="margin-top: 25px;"><h3>Final Closure</h3></div>
+            <div class="workflow-card" style="background: rgba(76, 175, 80, 0.05); border: 1px dashed #4caf50;">
+              <label>Root Cause</label>
+              <textarea id="rootCause" class="workflow-textarea" rows="2" placeholder="Identify the root cause..."></textarea>
+              <button id="closeDefectBtn" class="workflow-btn" style="background-color: #4caf50; width: 100%; margin-top: 15px;">Close Defect (Final)</button>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
+
   <script src="modules/data.js"></script>
   <script src="modules/ui.js"></script>
-  <script src="modules/workflow.js"></script>
+  <script src="modules/defect-details.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

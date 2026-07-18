@@ -34,6 +34,13 @@ if (typeof window !== 'undefined') {
       ADCMSMEL.init();
     }
   }
+  const { ADCMSDefectDetails } = window;
+  if (ADCMSDefectDetails && typeof document !== 'undefined') {
+    const shouldInitDetails = document.getElementById('defectHeader') || window.location.pathname.includes('defect.html');
+    if (shouldInitDetails) {
+      ADCMSDefectDetails.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
