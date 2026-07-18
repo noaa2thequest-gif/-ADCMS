@@ -13,12 +13,13 @@
   function renderAircraftGrid(containerId) {
     const grid = document.getElementById(containerId);
     if (!grid) return;
-    grid.innerHTML = aircraft.map(a => `
+    const aircraftList = data.getAircraft();
+    grid.innerHTML = aircraftList.map(a => `
       <article class="aircraft-card">
-        <header><div><h4>${a.reg}</h4><small>${a.type}</small></div><span class="tag ${a.cls}">${a.status}</span></header>
+        <header><div><h4>${a.registration}</h4><small>${a.model}</small></div><span class="tag ${a.status === 'SERVICEABLE' ? 'serviceable' : a.status === 'DEFERRED' ? 'deferred' : 'aog'}">${a.status}</span></header>
         <div class="plane">✈</div>
-        <div class="stats"><div><small>Open Defects</small><b>${a.open}</b></div><div><small>MEL Items</small><b>${a.mel}</b></div></div>
-        <div class="meta"><div><small>Location</small><b>⌖ ${a.loc}</b></div><div><small>Last Update</small><span>${a.update}</span></div></div>
+        <div class="stats"><div><small>Open Defects</small><b>${a.openDefects}</b></div><div><small>MEL Items</small><b>${a.melItems}</b></div></div>
+        <div class="meta"><div><small>Location</small><b>⌖ ${a.location}</b></div><div><small>Last Update</small><span>${a.lastUpdate}</span></div></div>
       </article>
     `).join('');
   }
@@ -38,7 +39,7 @@
     const completedEl = document.getElementById('counterCompletedToday');
     const badgeEl = document.getElementById('defectCountBadge');
 
-    if (totalAircraftEl) totalAircraftEl.textContent = String(aircraft.length);
+    if (totalAircraftEl) totalAircraftEl.textContent = String(data.getAircraft().length);
     if (openDefectsEl) openDefectsEl.textContent = '48'; // Mock data
     if (melItemsEl) melItemsEl.textContent = '15'; // Mock data
     if (aogEl) aogEl.textContent = String(aircraft.filter((a) => a.status === 'AOG').length);

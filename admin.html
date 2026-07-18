@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — Fleet Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✈</div>
+        <div>
+          <h1>ADCMS</h1>
+          <p>Aircraft Defect &<br>Maintenance Control System</p>
+        </div>
+      </div>
+
+      <nav>
+        <a href="index.html">⌂ <span>Fleet Overview</span></a>
+        <a href="#">◫ <span>Dashboard</span></a>
+        <a href="#">✈ <span>Aircraft</span></a>
+        <a href="#">▱ <span>Defect Control</span></a>
+        <a href="#">▤ <span>MEL Management</span></a>
+        <a href="#">▣ <span>Cabin Defects</span></a>
+        <a href="#">▥ <span>MCC Center</span></a>
+        <a href="#">◉ <span>Surveillance & SAFA</span></a>
+        <a href="#">▦ <span>Stores & Inventory</span></a>
+        <a href="#">◩ <span>Reports</span></a>
+        <a href="#">♧ <span>Notifications</span><b>8</b></a>
+        <a class="active" href="admin.html">⚙ <span>Administration</span></a>
+        <a href="#">▧ <span>Audit Log</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
+        <small id="appVersion">Version 1.0 (Prototype)<br>© 2025 ADCMS</small>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main>
+      <header>
+        <button class="menu" id="menuBtn">☰</button>
+        <div class="profile">
+          <span class="bell">♧<b>8</b></span>
+          <div class="avatar">H</div>
+          <div>
+            <strong>Hany Omar</strong>
+            <small>Super Admin</small>
+          </div>
+        </div>
+      </header>
+
+      <section class="content">
+        <!-- ========== TITLE ROW ========== -->
+        <div class="title-row">
+          <div>
+            <h2>Fleet Management</h2>
+            <p>Add, edit, and manage your aircraft fleet</p>
+          </div>
+          <div class="title-actions">
+            <button id="addAircraftBtn" class="new-defect-btn">+ Add Aircraft</button>
+          </div>
+        </div>
+
+        <!-- ========== ADD AIRCRAFT FORM ========== -->
+        <section id="addAircraftPanel" class="defect-form-panel" hidden>
+          <div class="defect-form-card">
+            <div class="section-head">
+              <h3 id="formTitle">Add New Aircraft</h3>
+              <button id="closeFormBtn" style="background: none; border: none; font-size: 20px; cursor: pointer;">✕</button>
+            </div>
+            <div class="workflow-grid">
+              <div class="workflow-card">
+                <label>Registration (Tail Number)</label>
+                <input id="aircraftReg" class="workflow-input" placeholder="e.g., SU-SKB" />
+                <label>Aircraft Model</label>
+                <input id="aircraftModel" class="workflow-input" placeholder="e.g., A320-232" />
+                <label>MSN (Manufacturer Serial Number)</label>
+                <input id="aircraftMsn" class="workflow-input" placeholder="e.g., 1234" />
+              </div>
+              <div class="workflow-card">
+                <label>Engines</label>
+                <input id="aircraftEngines" class="workflow-input" placeholder="e.g., CFM56-5B4/3" />
+                <label>Manufacturing Date</label>
+                <input id="aircraftMfgDate" class="workflow-input" type="date" />
+                <label>Location</label>
+                <input id="aircraftLocation" class="workflow-input" placeholder="e.g., CAI" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button id="saveAircraftBtn" class="workflow-btn">Save Aircraft</button>
+              <button id="cancelAircraftBtn" class="workflow-btn secondary">Cancel</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== AIRCRAFT TABLE ========== -->
+        <div class="section-head">
+          <h3>Aircraft Fleet</h3>
+          <span id="aircraftCountBadge" class="workflow-badge">0 aircraft</span>
+        </div>
+
+        <div class="panel">
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="border-bottom: 2px solid var(--line);">
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Registration</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Model</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">MSN</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Engines</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Mfg. Date</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Status</th>
+                  <th style="text-align: left; padding: 12px; font-weight: 700;">Location</th>
+                  <th style="text-align: center; padding: 12px; font-weight: 700;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="aircraftTableBody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="modules/data.js"></script>
+  <script src="modules/ui.js"></script>
+  <script src="modules/admin.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

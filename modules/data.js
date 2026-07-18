@@ -6,6 +6,8 @@
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
   const storageKey = 'adcms-workflow-state-v1';
+  const aircraftStorageKey = 'adcms-aircraft-fleet-v1';
+  
   const defaultWorkflowState = {
     activeDefect: {
       aircraft: 'SU-SKD',
@@ -23,6 +25,9 @@
     defects: []
   };
 
+  // Default aircraft data - Empty by default, user adds their own
+  const defaultAircraft = [];
+
   function loadState() {
     if (typeof localStorage === 'undefined') {
       return null;
@@ -32,6 +37,18 @@
       return raw ? JSON.parse(raw) : null;
     } catch (error) {
       return null;
+    }
+  }
+
+  function loadAircraft() {
+    if (typeof localStorage === 'undefined') {
+      return defaultAircraft;
+    }
+    try {
+      const raw = localStorage.getItem(aircraftStorageKey);
+      return raw ? JSON.parse(raw) : defaultAircraft;
+    } catch (error) {
+      return defaultAircraft;
     }
   }
 
@@ -45,65 +62,7 @@
   }
 
   const workflowState = normalizeState(loadState());
-
-  // Enhanced aircraft data matching the new design
-  const aircraftData = [
-    {
-      reg: 'SU-SKB',
-      type: 'A320-232',
-      status: 'SERVICEABLE',
-      cls: 'serviceable',
-      open: 3,
-      mel: 1,
-      loc: 'CAI',
-      update: '10 min ago',
-      image: '✈'
-    },
-    {
-      reg: 'SU-SKC',
-      type: 'A320-232',
-      status: 'DEFERRED',
-      cls: 'deferred',
-      open: 7,
-      mel: 2,
-      loc: 'HRG',
-      update: '15 min ago',
-      image: '✈'
-    },
-    {
-      reg: 'SU-SKD',
-      type: 'A321-231',
-      status: 'AOG',
-      cls: 'aog',
-      open: 12,
-      mel: 4,
-      loc: 'SSH',
-      update: '1 hour ago',
-      image: '✈'
-    },
-    {
-      reg: 'SU-SKE',
-      type: 'B737-800',
-      status: 'SERVICEABLE',
-      cls: 'serviceable',
-      open: 2,
-      mel: 0,
-      loc: 'CAI',
-      update: '8 min ago',
-      image: '✈'
-    },
-    {
-      reg: 'SU-SKF',
-      type: 'A320-232',
-      status: 'DEFERRED',
-      cls: 'deferred',
-      open: 5,
-      mel: 1,
-      loc: 'ASW',
-      update: '20 min ago',
-      image: '✈'
-    }
-  ];
+  let aircraftFleet = loadAircraft();
 
   // Defect sources for breakdown
   const defectSources = [
@@ -122,11 +81,72 @@
   };
 
   return {
-    aircraft: aircraftData,
+    // Aircraft management
+    getAircraft() {
+      return aircraftFleet;
+    },
+
+    addAircraft(aircraftData) {
+      const newAircraft = {
+        id: 'ac-' + Date.now(),
+        registration: aircraftData.registration,
+        model: aircraftData.model,
+        msn: aircraftData.msn,
+        engines: aircraftData.engines,
+        manufacturingDate: aircraftData.manufacturingDate,
+        status: aircraftData.status || 'SERVICEABLE',
+        location: aircraftData.location || 'CAI',
+        openDefects: 0,
+        melItems: 0,
+        lastUpdate: 'Just now'
+      };
+      aircraftFleet.push(newAircraft);
+      this.persistAircraft();
+      return newAircraft;
+    },
+
+    updateAircraft(aircraftId, updates) {
+      const aircraft = aircraftFleet.find(a => a.id === aircraftId);
+      if (aircraft) {
+        Object.assign(aircraft, updates);
+        this.persistAircraft();
+        return aircraft;
+      }
+      return null;
+    },
+
+    deleteAircraft(aircraftId) {
+      const index = aircraftFleet.findIndex(a => a.id === aircraftId);
+      if (index > -1) {
+        aircraftFleet.splice(index, 1);
+        this.persistAircraft();
+        return true;
+      }
+      return false;
+    },
+
+    getAircraftByRegistration(registration) {
+      return aircraftFleet.find(a => a.registration === registration);
+    },
+
+    persistAircraft() {
+      if (typeof localStorage === 'undefined') {
+        return;
+      }
+      try {
+        localStorage.setItem(aircraftStorageKey, JSON.stringify(aircraftFleet));
+      } catch (error) {
+        console.error('Error persisting aircraft:', error);
+      }
+    },
+
+    // Legacy properties for compatibility
+    aircraft: aircraftFleet,
     defectSources: defectSources,
     fleetStatus: fleetStatus,
     appVersion: { major: 1, minor: 0, build: 1 },
     workflowState,
+
     persistState() {
       if (typeof localStorage === 'undefined') {
         return;
@@ -134,7 +154,7 @@
       try {
         localStorage.setItem(storageKey, JSON.stringify(workflowState));
       } catch (error) {
-        // Ignore storage failures.
+        console.error('Error persisting state:', error);
       }
     }
   };
