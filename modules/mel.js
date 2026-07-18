@@ -147,8 +147,8 @@
           </td>
           <td>
             ${defect.hasExtension ? `
-              <span class="mel-badge" style="background-color: #9c27b0; color: white;">
-                ${defect.extensionType === 'first' ? '1st Ext.' : '2nd Ext.'}
+              <span class="mel-badge" style="background-color: ${defect.extensionType === 'second' ? '#673ab7' : '#9c27b0'}; color: white;">
+                ${defect.extensionType === 'first' ? '1st Concession' : '2nd Concession'}
               </span>
             ` : '-'}
           </td>

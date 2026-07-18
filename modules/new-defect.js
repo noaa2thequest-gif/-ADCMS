@@ -109,10 +109,15 @@
       }
     });
 
-    // Calculate extension expiry
+    // Calculate extension expiry - Auto-suggest but allow manual change
     extensionType.addEventListener('change', () => {
       if (extensionType.value && melExpiry.value) {
-        const newExpiry = calculateExtensionExpiry(melExpiry.value, extensionType.value);
+        // If it's the second concession, we might want to extend from the first extended date
+        const baseDate = (extensionType.value === 'second' && melExpiryExtended.value) 
+                        ? melExpiryExtended.value 
+                        : melExpiry.value;
+                        
+        const newExpiry = calculateExtensionExpiry(baseDate, extensionType.value);
         melExpiryExtended.value = newExpiry || '';
       }
     });
