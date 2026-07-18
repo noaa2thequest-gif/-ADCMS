@@ -8,11 +8,16 @@
 </head>
 <body>
   <div class="app">
+    <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="brand-icon">✈</div>
-        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
+        <div>
+          <h1>ADCMS</h1>
+          <p>Aircraft Defect &<br>Maintenance Control System</p>
+        </div>
       </div>
+
       <nav>
         <a class="active" href="#">⌂ <span>Fleet Overview</span></a>
         <a href="#">◫ <span>Dashboard</span></a>
@@ -28,107 +33,197 @@
         <a href="#">⚙ <span>Administration</span></a>
         <a href="#">▧ <span>Audit Log</span></a>
       </nav>
+
       <div class="sidebar-footer">
         <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
-        <small id="appVersion">Version 1.3 (Build 13)<br>© 2026 ADCMS</small>
+        <small id="appVersion">Version 1.0 (Prototype)<br>© 2025 ADCMS</small>
       </div>
     </aside>
 
+    <!-- ========== MAIN CONTENT ========== -->
     <main>
       <header>
         <button class="menu" id="menuBtn">☰</button>
-        <div class="profile"><span class="bell">♧<b>8</b></span><div class="avatar">H</div><div><strong>Hany Omar</strong><small>Super Admin</small></div></div>
+        <div class="profile">
+          <span class="bell">♧<b>8</b></span>
+          <div class="avatar">H</div>
+          <div>
+            <strong>Hany Omar</strong>
+            <small>Super Admin</small>
+          </div>
+        </div>
       </header>
 
       <section class="content">
+        <!-- ========== TITLE ROW ========== -->
         <div class="title-row">
-          <div><h2>Fleet Overview</h2><p>Real-time overview of fleet status and maintenance</p></div>
+          <div>
+            <h2>Fleet Overview</h2>
+            <p>Real-time overview of fleet status and maintenance</p>
+          </div>
           <div class="title-actions">
             <a id="newDefectBtn" class="new-defect-btn" href="new-defect.html">+ New Defect</a>
             <input id="search" placeholder="Search aircraft, tail number, or defect..." />
           </div>
         </div>
 
-        <section id="newDefectPanel" class="defect-form-panel" hidden>
-          <div class="defect-form-card">
-            <div class="section-head"><h3>Create New Defect</h3><span id="repeatHint" class="workflow-badge">Ready</span></div>
-            <div class="workflow-grid">
-              <div class="workflow-card">
-                <label>Aircraft</label>
-                <input id="newDefectAircraft" class="workflow-input" value="SU-SKD" />
-                <label>Defect Title</label>
-                <input id="newDefectIssue" class="workflow-input" value="Hydraulic pump noise" />
-                <label>Defect Source</label>
-                <select id="newDefectSource" class="workflow-input">
-                  <option>ECAM Message</option>
-                  <option>Failure Message</option>
-                  <option>Captain Entry</option>
-                  <option>Crew Observation</option>
-                  <option>Maintenance Observation</option>
-                  <option>Cabin Defect</option>
-                </select>
-                <label>Description</label>
-                <textarea id="newDefectDescription" class="workflow-textarea" rows="3" placeholder="Describe the defect and initial observations"></textarea>
-              </div>
-              <div class="workflow-card">
-                <label>Report Date</label>
-                <input id="newDefectDate" class="workflow-input" type="date" />
-                <p id="newDefectMessage" class="workflow-hint">A repeat defect will be flagged within 10 days for the same aircraft and issue.</p>
-                <div class="form-actions">
-                  <button id="saveDefectBtn" class="workflow-btn">Save defect</button>
-                  <button id="cancelDefectBtn" class="workflow-btn secondary">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
+        <!-- ========== KPI CARDS ========== -->
         <div class="kpis">
-          <article><div class="ico purple">✈</div><div><span>Total Aircraft</span><strong id="counterTotalAircraft">10</strong><small>Active</small></div></article>
-          <article><div class="ico yellow">▤</div><div><span>Open Defects</span><strong id="counterOpenDefects">29</strong><small class="up">↑ 4 vs yesterday</small></div></article>
-          <article><div class="ico red">!</div><div><span>MEL Items</span><strong>8</strong><small class="up">↑ 1 vs yesterday</small></div></article>
-          <article><div class="ico blue">▦</div><div><span>Aircraft On Ground</span><strong id="counterAogDefects">1</strong><small>10% of fleet</small></div></article>
-          <article><div class="ico green">✓</div><div><span>Completed Today</span><strong id="counterCompletedToday">12</strong><small class="down">↑ 3 vs yesterday</small></div></article>
+          <article>
+            <div class="ico purple">✈</div>
+            <div>
+              <span>Total Aircraft</span>
+              <strong id="counterTotalAircraft">12</strong>
+              <small>Active</small>
+            </div>
+          </article>
+
+          <article>
+            <div class="ico yellow">▤</div>
+            <div>
+              <span>Open Defects</span>
+              <strong id="counterOpenDefects">48</strong>
+              <small class="up">↑ 6 vs yesterday</small>
+            </div>
+          </article>
+
+          <article>
+            <div class="ico red">!</div>
+            <div>
+              <span>MEL Items</span>
+              <strong id="counterMelItems">15</strong>
+              <small class="up">↑ 2 vs yesterday</small>
+            </div>
+          </article>
+
+          <article>
+            <div class="ico blue">▦</div>
+            <div>
+              <span>Aircraft On Ground</span>
+              <strong id="counterAogDefects">3</strong>
+              <small>25% of fleet</small>
+            </div>
+          </article>
+
+          <article>
+            <div class="ico green">✓</div>
+            <div>
+              <span>Completed Today</span>
+              <strong id="counterCompletedToday">21</strong>
+              <small class="down">↑ 5 vs yesterday</small>
+            </div>
+          </article>
         </div>
 
-        <div class="section-head"><h3>Aircraft Status</h3><a href="#">View all aircraft →</a></div>
+        <!-- ========== AIRCRAFT STATUS ========== -->
+        <div class="section-head">
+          <h3>Aircraft Status</h3>
+          <a href="#">View all aircraft →</a>
+        </div>
         <div class="aircraft-grid" id="aircraftGrid"></div>
 
-        <section class="panel defect-control-panel">
-          <div class="section-head"><h3>Defect Control</h3><span id="defectCountBadge" class="workflow-badge">0 open</span></div>
-          <div id="defectControlList" class="defect-list"></div>
-        </section>
-
+        <!-- ========== BOTTOM GRID ========== -->
         <div class="bottom-grid">
+          <!-- Defects by Priority -->
           <article class="panel">
-            <h3>Defects by Source</h3>
-            <div class="donut-wrap"><div class="donut"><span><b id="sourceTotalCount">0</b><small>total</small></span></div>
+            <h3>Defects by Priority</h3>
+            <div class="donut-wrap">
+              <div class="donut">
+                <span>
+                  <b id="sourceTotalCount">48</b>
+                  <small>Total</small>
+                </span>
+              </div>
               <ul id="sourceBreakdownList"></ul>
             </div>
           </article>
+
+          <!-- Recent Activity -->
           <article class="panel">
             <h3>Recent Activity</h3>
-            <div class="activity"><p><i class="red-bg">⚒</i><span><b>New AOG defect on SU-SKD</b><small>ATA 27 — Flight Controls</small></span><time>10 min ago</time></p>
-            <p><i class="green-bg">✓</i><span><b>Defect closed on SU-SKB</b><small>ATA 21 — Air Conditioning</small></span><time>25 min ago</time></p>
-            <p><i class="purple-bg">▤</i><span><b>MEL item added on SU-SKC</b><small>ATA 23 — Communications</small></span><time>1 hour ago</time></p>
-            <p><i class="blue-bg">✈</i><span><b>Aircraft status updated</b><small>SU-SKE — CAI</small></span><time>2 hours ago</time></p></div>
+            <div class="activity">
+              <p>
+                <i class="red-bg">⚒</i>
+                <span>
+                  <b>New AOG defect on SU-SKD</b>
+                  <small>ATA 27 — Flight Controls</small>
+                </span>
+                <time>10 min ago</time>
+              </p>
+              <p>
+                <i class="green-bg">✓</i>
+                <span>
+                  <b>Defect closed on SU-SKB</b>
+                  <small>ATA 21 — Air Conditioning</small>
+                </span>
+                <time>25 min ago</time>
+              </p>
+              <p>
+                <i class="purple-bg">▤</i>
+                <span>
+                  <b>MEL item added on SU-SKC</b>
+                  <small>ATA 23 — Communications</small>
+                </span>
+                <time>1 hour ago</time>
+              </p>
+              <p>
+                <i class="blue-bg">✈</i>
+                <span>
+                  <b>SAFA report submitted</b>
+                  <small>SU-SKE — 2025-07-18</small>
+                </span>
+                <time>2 hours ago</time>
+              </p>
+            </div>
           </article>
+
+          <!-- Fleet Status Overview -->
           <article class="panel">
             <h3>Fleet Status Overview</h3>
             <div class="bars">
-              <label>Serviceable <b>6 (60%)</b></label><div><i style="width:60%"></i></div>
-              <label>Deferred <b>3 (30%)</b></label><div class="amber"><i style="width:30%"></i></div>
-              <label>AOG <b>1 (10%)</b></label><div class="danger"><i style="width:10%"></i></div>
-              <label>In Maintenance <b>0 (0%)</b></label><div class="muted"><i style="width:0%"></i></div>
+              <label>
+                Serviceable
+                <b id="statusServiceable">6 (50%)</b>
+              </label>
+              <div><i id="barServiceable" style="width: 50%"></i></div>
+
+              <label>
+                Deferred
+                <b id="statusDeferred">3 (25%)</b>
+              </label>
+              <div class="amber"><i id="barDeferred" style="width: 25%"></i></div>
+
+              <label>
+                AOG
+                <b id="statusAog">3 (25%)</b>
+              </label>
+              <div class="danger"><i id="barAog" style="width: 25%"></i></div>
+
+              <label>
+                In Maintenance
+                <b id="statusMaintenance">0 (0%)</b>
+              </label>
+              <div class="muted"><i id="barMaintenance" style="width: 0%"></i></div>
             </div>
           </article>
         </div>
+
+        <!-- ========== DEFECT CONTROL PANEL ========== -->
+        <section class="panel defect-control-panel">
+          <div class="section-head">
+            <h3>Defect Control</h3>
+            <span id="defectCountBadge" class="workflow-badge">0 open</span>
+          </div>
+          <div id="defectControlList" class="defect-list"></div>
+        </section>
       </section>
     </main>
   </div>
-<script src="modules/data.js"></script>
-<script src="modules/ui.js"></script>
-<script src="modules/dashboard.js"></script>
-<script src="app.js"></script>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="modules/data.js"></script>
+  <script src="modules/ui.js"></script>
+  <script src="modules/dashboard.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

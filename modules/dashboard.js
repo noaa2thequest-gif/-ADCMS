@@ -7,6 +7,8 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
   const data = root.ADCMSData || require('./data');
   const aircraft = data.aircraft || [];
+  const defectSources = data.defectSources || [];
+  const fleetStatus = data.fleetStatus || {};
 
   function renderAircraftGrid(containerId) {
     const grid = document.getElementById(containerId);
@@ -23,55 +25,113 @@
 
   function refreshCounters() {
     if (typeof document === 'undefined') return;
+
     const defects = (data.workflowState.defects || []).filter(Boolean);
-    const openCount = defects.filter(defect => defect.status === 'Open').length;
-    const closedCount = defects.filter(defect => defect.status === 'Closed').length;
-    const sourceCount = defects.filter(defect => Boolean(defect.defectSource || defect.severity)).length;
-    const openEl = document.getElementById('counterOpenDefects');
-    const completedEl = document.getElementById('counterCompletedToday');
+    const openCount = defects.filter((defect) => defect.status === 'Open').length;
+    const closedCount = defects.filter((defect) => defect.status === 'Closed').length;
+
+    // Update KPI counters
+    const totalAircraftEl = document.getElementById('counterTotalAircraft');
+    const openDefectsEl = document.getElementById('counterOpenDefects');
+    const melItemsEl = document.getElementById('counterMelItems');
     const aogEl = document.getElementById('counterAogDefects');
+    const completedEl = document.getElementById('counterCompletedToday');
     const badgeEl = document.getElementById('defectCountBadge');
+
+    if (totalAircraftEl) totalAircraftEl.textContent = String(aircraft.length);
+    if (openDefectsEl) openDefectsEl.textContent = '48'; // Mock data
+    if (melItemsEl) melItemsEl.textContent = '15'; // Mock data
+    if (aogEl) aogEl.textContent = String(aircraft.filter((a) => a.status === 'AOG').length);
+    if (completedEl) completedEl.textContent = '21'; // Mock data
+    if (badgeEl) badgeEl.textContent = `${openCount} open`;
+
+    // Update defect sources breakdown
+    updateDefectSources();
+
+    // Update fleet status bars
+    updateFleetStatus();
+  }
+
+  function updateDefectSources() {
+    if (typeof document === 'undefined') return;
+
     const breakdownListEl = document.getElementById('sourceBreakdownList');
     const sourceTotalEl = document.getElementById('sourceTotalCount');
-    if (openEl) openEl.textContent = String(openCount);
-    if (completedEl) completedEl.textContent = String(closedCount);
-    if (aogEl) aogEl.textContent = String(sourceCount);
-    if (badgeEl) badgeEl.textContent = `${openCount} open`;
-    if (sourceTotalEl) sourceTotalEl.textContent = String(defects.length);
-    const sourceOptions = ['ECAM Message', 'Failure Message', 'Captain Entry', 'Crew Observation', 'Maintenance Observation', 'Cabin Defect'];
-    const sourceColors = ['red-dot', 'orange-dot', 'yellow-dot', 'green-dot', 'red-dot', 'blue-dot'];
-    if (breakdownListEl) {
-      breakdownListEl.innerHTML = sourceOptions.map((source, index) => {
-        const count = defects.filter(defect => (defect.defectSource || defect.severity || '') === source).length;
-        return `<li><i class="d ${sourceColors[index]}"></i>${source} <b>${count}</b></li>`;
-      }).join('');
+
+    if (sourceTotalEl) {
+      const total = defectSources.reduce((sum, source) => sum + source.count, 0);
+      sourceTotalEl.textContent = String(total);
     }
+
+    if (breakdownListEl) {
+      breakdownListEl.innerHTML = defectSources
+        .map(
+          (source) => `
+        <li>
+          <i class="d ${source.color}"></i>
+          ${source.source}
+          <b>${source.count}</b>
+        </li>
+      `
+        )
+        .join('');
+    }
+  }
+
+  function updateFleetStatus() {
+    if (typeof document === 'undefined') return;
+
+    const statusServiceableEl = document.getElementById('statusServiceable');
+    const statusDeferredEl = document.getElementById('statusDeferred');
+    const statusAogEl = document.getElementById('statusAog');
+    const statusMaintenanceEl = document.getElementById('statusMaintenance');
+
+    const barServiceableEl = document.getElementById('barServiceable');
+    const barDeferredEl = document.getElementById('barDeferred');
+    const barAogEl = document.getElementById('barAog');
+    const barMaintenanceEl = document.getElementById('barMaintenance');
+
+    if (statusServiceableEl)
+      statusServiceableEl.textContent = `${fleetStatus.serviceable.count} (${fleetStatus.serviceable.percentage}%)`;
+    if (statusDeferredEl)
+      statusDeferredEl.textContent = `${fleetStatus.deferred.count} (${fleetStatus.deferred.percentage}%)`;
+    if (statusAogEl) statusAogEl.textContent = `${fleetStatus.aog.count} (${fleetStatus.aog.percentage}%)`;
+    if (statusMaintenanceEl)
+      statusMaintenanceEl.textContent = `${fleetStatus.maintenance.count} (${fleetStatus.maintenance.percentage}%)`;
+
+    if (barServiceableEl) barServiceableEl.style.width = `${fleetStatus.serviceable.percentage}%`;
+    if (barDeferredEl) barDeferredEl.style.width = `${fleetStatus.deferred.percentage}%`;
+    if (barAogEl) barAogEl.style.width = `${fleetStatus.aog.percentage}%`;
+    if (barMaintenanceEl) barMaintenanceEl.style.width = `${fleetStatus.maintenance.percentage}%`;
   }
 
   function bindSearch(inputId) {
     const searchInput = document.getElementById(inputId);
     if (!searchInput) return;
-    searchInput.addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      const filtered = aircraft.filter(a => Object.values(a).join(' ').toLowerCase().includes(q));
-      const grid = document.getElementById('aircraftGrid');
-      if (!grid) return;
-      grid.innerHTML = filtered.map(a => `
-        <article class="aircraft-card">
-          <header><div><h4>${a.reg}</h4><small>${a.type}</small></div><span class="tag ${a.cls}">${a.status}</span></header>
-          <div class="plane">✈</div>
-          <div class="stats"><div><small>Open Defects</small><b>${a.open}</b></div><div><small>MEL Items</small><b>${a.mel}</b></div></div>
-          <div class="meta"><div><small>Location</small><b>⌖ ${a.loc}</b></div><div><small>Last Update</small><span>${a.update}</span></div></div>
-        </article>
-      `).join('');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll('.aircraft-card');
+
+      cards.forEach((card) => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? '' : 'none';
+      });
     });
   }
 
   function init() {
     renderAircraftGrid('aircraftGrid');
-    bindSearch('search');
     refreshCounters();
+    bindSearch('search');
   }
 
-  return { init, renderAircraftGrid, refreshCounters };
+  return {
+    init,
+    renderAircraftGrid,
+    refreshCounters,
+    bindSearch,
+    updateDefectSources,
+    updateFleetStatus
+  };
 });
