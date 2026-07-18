@@ -7,8 +7,11 @@ if (typeof window !== 'undefined') {
   if (ADCMSDashboard) {
     ADCMSDashboard.init();
   }
-  if (ADCMSWorkflow && typeof document !== 'undefined' && document.getElementById('workflowBadge')) {
-    ADCMSWorkflow.init();
+  if (ADCMSWorkflow && typeof document !== 'undefined') {
+    const shouldInitWorkflow = document.getElementById('workflowBadge') || document.getElementById('newDefectBtn') || document.getElementById('saveDefectBtn') || window.location.pathname.includes('new-defect.html');
+    if (shouldInitWorkflow) {
+      ADCMSWorkflow.init();
+    }
   }
 }
 

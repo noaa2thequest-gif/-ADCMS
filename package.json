@@ -1,0 +1,24 @@
+{
+  "name": "-adcms",
+  "version": "1.0.0",
+  "description": "Aircraft Defect Control &amp; Maintenance System ## Build 1.3 This release updates the ADCMS dashboard to build 1.3 with refreshed version labeling and release readiness.",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noaa2thequest-gif/-ADCMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/noaa2thequest-gif/-ADCMS/issues"
+  },
+  "homepage": "https://github.com/noaa2thequest-gif/-ADCMS#readme"
+}

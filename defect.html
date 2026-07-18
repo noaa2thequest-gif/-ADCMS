@@ -31,7 +31,10 @@
 
       <section class="content">
         <div class="title-row">
-          <div><h2>Defect Workflow</h2><p>Manage repeat-defect detection, troubleshooting history, attachments and closure.</p></div>
+          <div><h2>Defect Workflow</h2><p id="workflowHeading">Manage repeat-defect detection, troubleshooting history, attachments and closure.</p></div>
+          <div class="title-actions">
+            <a href="new-defect.html" class="new-defect-btn">+ New Defect</a>
+          </div>
         </div>
 
         <section class="workflow-section">
@@ -47,12 +50,14 @@
                 <input id="workflowAircraft" class="workflow-input" value="SU-SKD" />
                 <label>Defect Title</label>
                 <input id="workflowIssue" class="workflow-input" value="Hydraulic pump noise" />
-                <label>Severity</label>
-                <select id="workflowSeverity" class="workflow-input">
-                  <option>AOG</option>
-                  <option>High</option>
-                  <option>Medium</option>
-                  <option>Low</option>
+                <label>Defect Source</label>
+                <select id="workflowDefectSource" class="workflow-input">
+                  <option>ECAM Message</option>
+                  <option>Failure Message</option>
+                  <option>Captain Entry</option>
+                  <option>Crew Observation</option>
+                  <option>Maintenance Observation</option>
+                  <option>Cabin Defect</option>
                 </select>
                 <label>Troubleshooting Note</label>
                 <textarea id="workflowNote" class="workflow-textarea" rows="3" placeholder="Describe what was inspected or repaired"></textarea>

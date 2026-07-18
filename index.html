@@ -43,25 +43,67 @@
       <section class="content">
         <div class="title-row">
           <div><h2>Fleet Overview</h2><p>Real-time overview of fleet status and maintenance</p></div>
-          <input id="search" placeholder="Search aircraft, tail number, or defect..." />
+          <div class="title-actions">
+            <a id="newDefectBtn" class="new-defect-btn" href="new-defect.html">+ New Defect</a>
+            <input id="search" placeholder="Search aircraft, tail number, or defect..." />
+          </div>
         </div>
 
+        <section id="newDefectPanel" class="defect-form-panel" hidden>
+          <div class="defect-form-card">
+            <div class="section-head"><h3>Create New Defect</h3><span id="repeatHint" class="workflow-badge">Ready</span></div>
+            <div class="workflow-grid">
+              <div class="workflow-card">
+                <label>Aircraft</label>
+                <input id="newDefectAircraft" class="workflow-input" value="SU-SKD" />
+                <label>Defect Title</label>
+                <input id="newDefectIssue" class="workflow-input" value="Hydraulic pump noise" />
+                <label>Defect Source</label>
+                <select id="newDefectSource" class="workflow-input">
+                  <option>ECAM Message</option>
+                  <option>Failure Message</option>
+                  <option>Captain Entry</option>
+                  <option>Crew Observation</option>
+                  <option>Maintenance Observation</option>
+                  <option>Cabin Defect</option>
+                </select>
+                <label>Description</label>
+                <textarea id="newDefectDescription" class="workflow-textarea" rows="3" placeholder="Describe the defect and initial observations"></textarea>
+              </div>
+              <div class="workflow-card">
+                <label>Report Date</label>
+                <input id="newDefectDate" class="workflow-input" type="date" />
+                <p id="newDefectMessage" class="workflow-hint">A repeat defect will be flagged within 10 days for the same aircraft and issue.</p>
+                <div class="form-actions">
+                  <button id="saveDefectBtn" class="workflow-btn">Save defect</button>
+                  <button id="cancelDefectBtn" class="workflow-btn secondary">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div class="kpis">
-          <article><div class="ico purple">✈</div><div><span>Total Aircraft</span><strong>10</strong><small>Active</small></div></article>
-          <article><div class="ico yellow">▤</div><div><span>Open Defects</span><strong>29</strong><small class="up">↑ 4 vs yesterday</small></div></article>
+          <article><div class="ico purple">✈</div><div><span>Total Aircraft</span><strong id="counterTotalAircraft">10</strong><small>Active</small></div></article>
+          <article><div class="ico yellow">▤</div><div><span>Open Defects</span><strong id="counterOpenDefects">29</strong><small class="up">↑ 4 vs yesterday</small></div></article>
           <article><div class="ico red">!</div><div><span>MEL Items</span><strong>8</strong><small class="up">↑ 1 vs yesterday</small></div></article>
-          <article><div class="ico blue">▦</div><div><span>Aircraft On Ground</span><strong>1</strong><small>10% of fleet</small></div></article>
-          <article><div class="ico green">✓</div><div><span>Completed Today</span><strong>12</strong><small class="down">↑ 3 vs yesterday</small></div></article>
+          <article><div class="ico blue">▦</div><div><span>Aircraft On Ground</span><strong id="counterAogDefects">1</strong><small>10% of fleet</small></div></article>
+          <article><div class="ico green">✓</div><div><span>Completed Today</span><strong id="counterCompletedToday">12</strong><small class="down">↑ 3 vs yesterday</small></div></article>
         </div>
 
         <div class="section-head"><h3>Aircraft Status</h3><a href="#">View all aircraft →</a></div>
         <div class="aircraft-grid" id="aircraftGrid"></div>
 
+        <section class="panel defect-control-panel">
+          <div class="section-head"><h3>Defect Control</h3><span id="defectCountBadge" class="workflow-badge">0 open</span></div>
+          <div id="defectControlList" class="defect-list"></div>
+        </section>
+
         <div class="bottom-grid">
           <article class="panel">
-            <h3>Defects by Priority</h3>
-            <div class="donut-wrap"><div class="donut"><span><b>29</b>Total</span></div>
-              <ul><li><i class="d red-dot"></i>AOG <b>4</b></li><li><i class="d orange-dot"></i>High <b>9</b></li><li><i class="d yellow-dot"></i>Medium <b>10</b></li><li><i class="d green-dot"></i>Low <b>6</b></li></ul>
+            <h3>Defects by Source</h3>
+            <div class="donut-wrap"><div class="donut"><span><b id="sourceTotalCount">0</b><small>total</small></span></div>
+              <ul id="sourceBreakdownList"></ul>
             </div>
           </article>
           <article class="panel">
