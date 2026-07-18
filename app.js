@@ -20,6 +20,20 @@ if (typeof window !== 'undefined') {
       ADCMSAdmin.init();
     }
   }
+  const { ADCMSNewDefect } = window;
+  if (ADCMSNewDefect && typeof document !== 'undefined') {
+    const shouldInitNewDefect = document.getElementById('newDefectIsMel') || window.location.pathname.includes('new-defect.html');
+    if (shouldInitNewDefect) {
+      ADCMSNewDefect.init();
+    }
+  }
+  const { ADCMSMEL } = window;
+  if (ADCMSMEL && typeof document !== 'undefined') {
+    const shouldInitMEL = document.getElementById('melStats') || window.location.pathname.includes('mel.html');
+    if (shouldInitMEL) {
+      ADCMSMEL.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
