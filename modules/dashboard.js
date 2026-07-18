@@ -40,10 +40,11 @@
     const badgeEl = document.getElementById('defectCountBadge');
 
     if (totalAircraftEl) totalAircraftEl.textContent = String(data.getAircraft().length);
-    if (openDefectsEl) openDefectsEl.textContent = '48'; // Mock data
-    if (melItemsEl) melItemsEl.textContent = '15'; // Mock data
-    if (aogEl) aogEl.textContent = String(aircraft.filter((a) => a.status === 'AOG').length);
-    if (completedEl) completedEl.textContent = '21'; // Mock data
+    const aircraftList = data.getAircraft();
+    if (openDefectsEl) openDefectsEl.textContent = String(openCount);
+    if (melItemsEl) melItemsEl.textContent = String(aircraftList.reduce((sum, a) => sum + (a.melItems || 0), 0));
+    if (aogEl) aogEl.textContent = String(aircraftList.filter((a) => a.status === 'AOG').length);
+    if (completedEl) completedEl.textContent = String(closedCount);
     if (badgeEl) badgeEl.textContent = `${openCount} open`;
 
     // Update defect sources breakdown

@@ -73,7 +73,7 @@
             <div class="ico purple">✈</div>
             <div>
               <span>Total Aircraft</span>
-              <strong id="counterTotalAircraft">12</strong>
+              <strong id="counterTotalAircraft">0</strong>
               <small>Active</small>
             </div>
           </article>
@@ -82,8 +82,8 @@
             <div class="ico yellow">▤</div>
             <div>
               <span>Open Defects</span>
-              <strong id="counterOpenDefects">48</strong>
-              <small class="up">↑ 6 vs yesterday</small>
+              <strong id="counterOpenDefects">0</strong>
+              <small>Current Open</small>
             </div>
           </article>
 
@@ -91,8 +91,8 @@
             <div class="ico red">!</div>
             <div>
               <span>MEL Items</span>
-              <strong id="counterMelItems">15</strong>
-              <small class="up">↑ 2 vs yesterday</small>
+              <strong id="counterMelItems">0</strong>
+              <small>Active MELs</small>
             </div>
           </article>
 
@@ -100,8 +100,8 @@
             <div class="ico blue">▦</div>
             <div>
               <span>Aircraft On Ground</span>
-              <strong id="counterAogDefects">3</strong>
-              <small>25% of fleet</small>
+              <strong id="counterAogDefects">0</strong>
+              <small>AOG Status</small>
             </div>
           </article>
 
@@ -109,8 +109,8 @@
             <div class="ico green">✓</div>
             <div>
               <span>Completed Today</span>
-              <strong id="counterCompletedToday">21</strong>
-              <small class="down">↑ 5 vs yesterday</small>
+              <strong id="counterCompletedToday">0</strong>
+              <small>Closed Today</small>
             </div>
           </article>
         </div>
@@ -130,7 +130,7 @@
             <div class="donut-wrap">
               <div class="donut">
                 <span>
-                  <b id="sourceTotalCount">48</b>
+                  <b id="sourceTotalCount">0</b>
                   <small>Total</small>
                 </span>
               </div>
@@ -141,39 +141,8 @@
           <!-- Recent Activity -->
           <article class="panel">
             <h3>Recent Activity</h3>
-            <div class="activity">
-              <p>
-                <i class="red-bg">⚒</i>
-                <span>
-                  <b>New AOG defect on SU-SKD</b>
-                  <small>ATA 27 — Flight Controls</small>
-                </span>
-                <time>10 min ago</time>
-              </p>
-              <p>
-                <i class="green-bg">✓</i>
-                <span>
-                  <b>Defect closed on SU-SKB</b>
-                  <small>ATA 21 — Air Conditioning</small>
-                </span>
-                <time>25 min ago</time>
-              </p>
-              <p>
-                <i class="purple-bg">▤</i>
-                <span>
-                  <b>MEL item added on SU-SKC</b>
-                  <small>ATA 23 — Communications</small>
-                </span>
-                <time>1 hour ago</time>
-              </p>
-              <p>
-                <i class="blue-bg">✈</i>
-                <span>
-                  <b>SAFA report submitted</b>
-                  <small>SU-SKE — 2025-07-18</small>
-                </span>
-                <time>2 hours ago</time>
-              </p>
+            <div id="recentActivityList" class="activity">
+              <p style="text-align: center; color: var(--text-dim); padding: 20px;">No recent activity</p>
             </div>
           </article>
 
@@ -183,21 +152,21 @@
             <div class="bars">
               <label>
                 Serviceable
-                <b id="statusServiceable">6 (50%)</b>
+                <b id="statusServiceable">0 (0%)</b>
               </label>
-              <div><i id="barServiceable" style="width: 50%"></i></div>
+              <div><i id="barServiceable" style="width: 0%"></i></div>
 
               <label>
                 Deferred
-                <b id="statusDeferred">3 (25%)</b>
+                <b id="statusDeferred">0 (0%)</b>
               </label>
-              <div class="amber"><i id="barDeferred" style="width: 25%"></i></div>
+              <div class="amber"><i id="barDeferred" style="width: 0%"></i></div>
 
               <label>
                 AOG
-                <b id="statusAog">3 (25%)</b>
+                <b id="statusAog">0 (0%)</b>
               </label>
-              <div class="danger"><i id="barAog" style="width: 25%"></i></div>
+              <div class="danger"><i id="barAog" style="width: 0%"></i></div>
 
               <label>
                 In Maintenance

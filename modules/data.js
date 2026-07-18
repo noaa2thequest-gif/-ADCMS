@@ -9,19 +9,8 @@
   const aircraftStorageKey = 'adcms-aircraft-fleet-v1';
   
   const defaultWorkflowState = {
-    activeDefect: {
-      aircraft: 'SU-SKD',
-      issue: 'Hydraulic pump noise',
-      defectSource: 'ECAM Message',
-      status: 'Open',
-      repeatDefect: false,
-      troubleshooting: [],
-      attachments: [],
-      rootCause: ''
-    },
-    history: [
-      { aircraft: 'SU-SKD', issue: 'Hydraulic pump noise', status: 'Closed', rootCause: 'Pump seal wear', reportedAt: '2026-07-10T09:00:00.000Z' }
-    ],
+    activeDefect: null,
+    history: [],
     defects: []
   };
 
@@ -64,19 +53,19 @@
   const workflowState = normalizeState(loadState());
   let aircraftFleet = loadAircraft();
 
-  // Defect sources for breakdown
+  // Defect sources for breakdown - Reset to zero
   const defectSources = [
-    { source: 'AOG', count: 12, color: 'red-dot', percentage: 25 },
-    { source: 'High', count: 18, color: 'orange-dot', percentage: 37.5 },
-    { source: 'Medium', count: 10, color: 'yellow-dot', percentage: 20.8 },
-    { source: 'Low', count: 8, color: 'green-dot', percentage: 16.7 }
+    { source: 'AOG', count: 0, color: 'red-dot', percentage: 0 },
+    { source: 'High', count: 0, color: 'orange-dot', percentage: 0 },
+    { source: 'Medium', count: 0, color: 'yellow-dot', percentage: 0 },
+    { source: 'Low', count: 0, color: 'green-dot', percentage: 0 }
   ];
 
-  // Fleet status breakdown
+  // Fleet status breakdown - Reset to zero
   const fleetStatus = {
-    serviceable: { count: 6, percentage: 50, status: 'Serviceable' },
-    deferred: { count: 3, percentage: 25, status: 'Deferred' },
-    aog: { count: 3, percentage: 25, status: 'AOG' },
+    serviceable: { count: 0, percentage: 0, status: 'Serviceable' },
+    deferred: { count: 0, percentage: 0, status: 'Deferred' },
+    aog: { count: 0, percentage: 0, status: 'AOG' },
     maintenance: { count: 0, percentage: 0, status: 'In Maintenance' }
   };
 
