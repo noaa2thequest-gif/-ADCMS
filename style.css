@@ -33,6 +33,24 @@ body {
   min-height: 100vh;
 }
 
+@media (max-width: 1024px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    left: -220px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+  .menu {
+    display: block !important;
+  }
+}
+
 /* ========== SIDEBAR ========== */
 .sidebar {
   background: linear-gradient(180deg, #29135e 0%, #171036 100%);
@@ -328,7 +346,7 @@ header {
 /* ========== KPI CARDS ========== */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -454,11 +472,9 @@ header {
 /* ========== AIRCRAFT GRID ========== */
 .aircraft-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 28px;
-  overflow-x: auto;
-  padding-bottom: 8px;
 }
 
 .aircraft-card {
