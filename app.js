@@ -30,7 +30,7 @@ if (typeof window !== 'undefined') {
       // UI already initialized above
 
       // Dashboard
-      if (ADCMSDashboard && document.getElementById('aircraftGrid')) {
+      if (ADCMSDashboard && (document.getElementById('aircraftGrid') || document.getElementById('counterTotalAircraft'))) {
         await ADCMSDashboard.init();
       }
 
