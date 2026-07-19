@@ -1,113 +1,104 @@
 if (typeof window !== 'undefined') {
-  // Initialize Cloud Connection
+  // Initialize Cloud Connection and App
   (async () => {
-    if (window.ADCMSData && typeof window.ADCMSData.initCloud === 'function') {
-      await window.ADCMSData.initCloud();
-      console.log('☁️ Cloud initialization completed');
+    try {
+      // 1. Initialize Cloud Connection
+      if (window.ADCMSData && typeof window.ADCMSData.initCloud === 'function') {
+        await window.ADCMSData.initCloud();
+        console.log('☁️ Cloud initialization completed');
+      }
+      
+      // 2. Security Check
+      if (window.ADCMSAuth) {
+        window.ADCMSAuth.checkAccess();
+      }
+
+      // 3. Initialize Modules based on presence in DOM
+      const { ADCMSUI, ADCMSDashboard, ADCMSWorkflow, ADCMSAdmin, ADCMSNewDefect, 
+              ADCMSMEL, ADCMSDefectDetails, ADCMSAircraftStatus, ADCMSSurveillance, 
+              ADCMSReports, ADCMSCabinDefects, ADCMSMCCCenter, ADCMSStores } = window;
+
+      if (ADCMSUI) ADCMSUI.init();
+
+      // Dashboard
+      if (ADCMSDashboard && document.getElementById('aircraftGrid')) {
+        await ADCMSDashboard.init();
+      }
+
+      // Workflow & Defects
+      if (ADCMSWorkflow) {
+        const isDefectPage = document.getElementById('defectControlList') || 
+                             document.getElementById('newDefectBtn') || 
+                             window.location.pathname.includes('new-defect.html');
+        if (isDefectPage) await ADCMSWorkflow.init();
+      }
+
+      // Administration
+      if (ADCMSAdmin && (document.getElementById('addAircraftBtn') || window.location.pathname.includes('admin.html'))) {
+        await ADCMSAdmin.init();
+      }
+
+      // New Defect
+      if (ADCMSNewDefect && (document.getElementById('newDefectIsMel') || window.location.pathname.includes('new-defect.html'))) {
+        await ADCMSNewDefect.init();
+      }
+
+      // MEL Management
+      if (ADCMSMEL && (document.getElementById('melStats') || window.location.pathname.includes('mel.html'))) {
+        await ADCMSMEL.init();
+      }
+
+      // Defect Details
+      if (ADCMSDefectDetails && (document.getElementById('defectHeader') || window.location.pathname.includes('defect.html'))) {
+        await ADCMSDefectDetails.init();
+      }
+
+      // Aircraft Status
+      if (ADCMSAircraftStatus && (document.getElementById('aircraftHeader') || window.location.pathname.includes('aircraft-status.html'))) {
+        await ADCMSAircraftStatus.init();
+      }
+
+      // Surveillance & SAFA
+      if (ADCMSSurveillance && (document.getElementById('safaAircraft') || window.location.pathname.includes('surveillance.html'))) {
+        await ADCMSSurveillance.init();
+      }
+
+      // Reports
+      if (ADCMSReports && (document.getElementById('summaryGrid') || window.location.pathname.includes('reports.html'))) {
+        await ADCMSReports.init();
+      }
+
+      // Cabin Defects
+      if (ADCMSCabinDefects && (document.getElementById('cabinDefectsGrid') || window.location.pathname.includes('cabin-defects.html'))) {
+        await ADCMSCabinDefects.init();
+      }
+
+      // MCC Center
+      if (ADCMSMCCCenter && (document.getElementById('mccMelList') || window.location.pathname.includes('mcc-center.html'))) {
+        await ADCMSMCCCenter.init();
+      }
+
+      // Stores
+      if (ADCMSStores && (document.getElementById('storesTable') || window.location.pathname.includes('stores.html'))) {
+        await ADCMSStores.init();
+      }
+
+      console.log('✅ ADCMS Modules Initialized');
+    } catch (error) {
+      console.error('❌ App initialization failed:', error);
     }
   })();
-  
-  // Security Check
-  if (window.ADCMSAuth) {
-    window.ADCMSAuth.checkAccess();
-  }
-
-  const { ADCMSUI } = window;
-  const { ADCMSDashboard } = window;
-  const { ADCMSWorkflow } = window;
-  const { ADCMSAdmin } = window;
-
-  ADCMSUI.init();
-  if (ADCMSDashboard) {
-    ADCMSDashboard.init();
-  }
-  if (ADCMSWorkflow && typeof document !== 'undefined') {
-    const shouldInitWorkflow = document.getElementById('workflowBadge') || document.getElementById('newDefectBtn') || document.getElementById('saveDefectBtn') || window.location.pathname.includes('new-defect.html');
-    if (shouldInitWorkflow) {
-      ADCMSWorkflow.init();
-    }
-  }
-  if (ADCMSAdmin && typeof document !== 'undefined') {
-    const shouldInitAdmin = document.getElementById('addAircraftBtn') || window.location.pathname.includes('admin.html');
-    if (shouldInitAdmin) {
-      ADCMSAdmin.init();
-    }
-  }
-  const { ADCMSNewDefect } = window;
-  if (ADCMSNewDefect && typeof document !== 'undefined') {
-    const shouldInitNewDefect = document.getElementById('newDefectIsMel') || window.location.pathname.includes('new-defect.html');
-    if (shouldInitNewDefect) {
-      ADCMSNewDefect.init();
-    }
-  }
-  const { ADCMSMEL } = window;
-  if (ADCMSMEL && typeof document !== 'undefined') {
-    const shouldInitMEL = document.getElementById('melStats') || window.location.pathname.includes('mel.html');
-    if (shouldInitMEL) {
-      ADCMSMEL.init();
-    }
-  }
-  const { ADCMSDefectDetails } = window;
-  if (ADCMSDefectDetails && typeof document !== 'undefined') {
-    const shouldInitDetails = document.getElementById('defectHeader') || window.location.pathname.includes('defect.html');
-    if (shouldInitDetails) {
-      ADCMSDefectDetails.init();
-    }
-  }
-  const { ADCMSAircraftStatus } = window;
-  if (ADCMSAircraftStatus && typeof document !== 'undefined') {
-    const shouldInitStatus = document.getElementById('aircraftHeader') || window.location.pathname.includes('aircraft-status.html');
-    if (shouldInitStatus) {
-      ADCMSAircraftStatus.init();
-    }
-  }
-  const { ADCMSSurveillance } = window;
-  if (ADCMSSurveillance && typeof document !== 'undefined') {
-    const shouldInitSurveillance = document.getElementById('safaAircraft') || window.location.pathname.includes('surveillance.html');
-    if (shouldInitSurveillance) {
-      ADCMSSurveillance.init();
-    }
-  }
-  const { ADCMSReports } = window;
-  if (ADCMSReports && typeof document !== 'undefined') {
-    const shouldInitReports = document.getElementById('summaryGrid') || window.location.pathname.includes('reports.html');
-    if (shouldInitReports) {
-      ADCMSReports.init();
-    }
-  }
-  const { ADCMSCabinDefects } = window;
-  if (ADCMSCabinDefects && typeof document !== 'undefined') {
-    const shouldInitCabin = document.getElementById('cabinDefectsGrid') || window.location.pathname.includes('cabin-defects.html');
-    if (shouldInitCabin) {
-      ADCMSCabinDefects.init();
-    }
-  }
-  const { ADCMSMCCCenter } = window;
-  if (ADCMSMCCCenter && typeof document !== 'undefined') {
-    const shouldInitMCC = document.getElementById('mccMelList') || window.location.pathname.includes('mcc-center.html');
-    if (shouldInitMCC) {
-      ADCMSMCCCenter.init();
-    }
-  }
-  const { ADCMSStores } = window;
-  if (ADCMSStores && typeof document !== 'undefined') {
-    const shouldInitStores = document.getElementById('storesTable') || window.location.pathname.includes('stores.html');
-    if (shouldInitStores) {
-      ADCMSStores.init();
-    }
-  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    init() {
+    async init() {
       if (typeof window !== 'undefined') {
-        const { ADCMSUI } = window;
-        const { ADCMSDashboard } = window;
-        const { ADCMSWorkflow } = window;
-        if (ADCMSUI) ADCMSUI.init();
-        if (ADCMSDashboard) ADCMSDashboard.init();
-        if (ADCMSWorkflow) ADCMSWorkflow.init();
+        if (window.ADCMSData && typeof window.ADCMSData.initCloud === 'function') {
+          await window.ADCMSData.initCloud();
+        }
+        if (window.ADCMSUI) window.ADCMSUI.init();
+        if (window.ADCMSDashboard) await window.ADCMSDashboard.init();
       }
     }
   };
