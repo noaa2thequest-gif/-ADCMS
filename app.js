@@ -62,6 +62,13 @@ if (typeof window !== 'undefined') {
       ADCMSReports.init();
     }
   }
+  const { ADCMSCabinDefects } = window;
+  if (ADCMSCabinDefects && typeof document !== 'undefined') {
+    const shouldInitCabin = document.getElementById('cabinDefectsGrid') || window.location.pathname.includes('cabin-defects.html');
+    if (shouldInitCabin) {
+      ADCMSCabinDefects.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
