@@ -22,7 +22,12 @@ if (typeof window !== 'undefined') {
               ADCMSMEL, ADCMSDefectDetails, ADCMSAircraftStatus, ADCMSSurveillance, 
               ADCMSReports, ADCMSCabinDefects, ADCMSMCCCenter, ADCMSStores } = window;
 
-      if (ADCMSUI) ADCMSUI.init();
+      // Force UI init first
+      if (ADCMSUI && typeof ADCMSUI.init === 'function') {
+        ADCMSUI.init();
+      }
+
+      // UI already initialized above
 
       // Dashboard
       if (ADCMSDashboard && document.getElementById('aircraftGrid')) {
