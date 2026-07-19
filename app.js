@@ -76,6 +76,13 @@ if (typeof window !== 'undefined') {
       ADCMSMCCCenter.init();
     }
   }
+  const { ADCMSStores } = window;
+  if (ADCMSStores && typeof document !== 'undefined') {
+    const shouldInitStores = document.getElementById('storesTable') || window.location.pathname.includes('stores.html');
+    if (shouldInitStores) {
+      ADCMSStores.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
