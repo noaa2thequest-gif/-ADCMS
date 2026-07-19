@@ -7,9 +7,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
   const data = root.ADCMSData || require('./data');
   
-  // Supabase Configuration
-  const SUPABASE_URL = 'https://tfgioiziknxqrfrodkkc.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_9hZupGiWDWs2k5p_rJYt7g_x6aezzRl';
+  // Supabase Configuration (Placeholders)
+  const SUPABASE_URL = 'https://YOUR_PROJECT_URL.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
   
   let supabase = null;
   let useCloud = false;
@@ -23,7 +23,8 @@
   
   // Initialize Supabase
   const initSupabase = async () => {
-    if (window.supabase && !supabase) {
+    // Only try to init if we have valid credentials (not placeholders)
+    if (window.supabase && SUPABASE_URL.includes('supabase.co') && !SUPABASE_URL.includes('YOUR_PROJECT_URL')) {
       try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         useCloud = true;
@@ -35,14 +36,17 @@
         return false;
       }
     }
+    useCloud = false;
     return false;
   };
   
   // Auto-initialize on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSupabase);
-  } else {
-    initSupabase();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSupabase);
+    } else {
+      initSupabase();
+    }
   }
 
   async function getUsers() {
@@ -84,32 +88,66 @@
   }
 
   async function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
     const errorMsg = document.getElementById('errorMsg');
+    const loginBtn = document.querySelector('button[onclick="ADCMSAuth.login()"]') || document.querySelector('.login-btn');
 
-    const users = await getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+    if (!emailInput || !passwordInput) return;
 
-    if (user) {
-      if (!user.approved) {
-        errorMsg.textContent = 'Account pending approval by Admin.';
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      if (errorMsg) {
+        errorMsg.textContent = 'Please enter both email and password.';
         errorMsg.style.display = 'block';
-        return;
       }
-      localStorage.setItem('adcms_logged_in_user', JSON.stringify(user));
-      window.location.href = 'index.html';
-    } else {
-      errorMsg.textContent = 'Invalid email or password.';
-      errorMsg.style.display = 'block';
+      return;
+    }
+
+    // Visual feedback
+    if (loginBtn) {
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+    }
+
+    try {
+      const users = await getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && String(u.password) === String(password));
+
+      if (user) {
+        if (!user.approved) {
+          if (errorMsg) {
+            errorMsg.textContent = 'Account pending approval by Admin.';
+            errorMsg.style.display = 'block';
+          }
+        } else {
+          localStorage.setItem('adcms_logged_in_user', JSON.stringify(user));
+          window.location.href = 'index.html';
+        }
+      } else {
+        if (errorMsg) {
+          errorMsg.textContent = 'Invalid email or password.';
+          errorMsg.style.display = 'block';
+        }
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      if (errorMsg) {
+        errorMsg.textContent = 'An error occurred during login.';
+        errorMsg.style.display = 'block';
+      }
+    } finally {
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login to Dashboard';
+      }
     }
   }
 
   function logout() {
     localStorage.removeItem('adcms_logged_in_user');
-    if (useCloud && supabase) {
-      supabase.auth.signOut().catch(e => console.warn('Signout warning:', e));
-    }
     window.location.href = 'login.html';
   }
 
@@ -119,41 +157,20 @@
   }
   
   async function getCurrentUserAsync() {
-    const user = getCurrentUser();
-    if (user) return user;
-    
-    if (useCloud && supabase) {
-      try {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser) {
-          const { data: userData } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', authUser.email)
-            .single();
-          return userData;
-        }
-      } catch (error) {
-        console.warn('⚠️ Cloud user fetch failed:', error);
-      }
-    }
-    return null;
+    return getCurrentUser();
   }
 
   function checkAccess() {
     const user = getCurrentUser();
     const path = window.location.pathname;
 
-    // Allow login page always
     if (path.includes('login.html')) return;
 
-    // Redirect to login if not logged in
     if (!user) {
       window.location.href = 'login.html';
       return;
     }
 
-    // Role-based restrictions
     const restrictions = {
       'mcc': ['admin.html', 'surveillance.html'],
       'engineer': ['mcc-center.html', 'admin.html', 'reports.html'],

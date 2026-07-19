@@ -127,7 +127,7 @@
 
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••" />
+      <input type="password" id="password" placeholder="••••••••" onkeypress="if(event.key === 'Enter') ADCMSAuth.login()" />
     </div>
 
     <button class="login-btn" onclick="ADCMSAuth.login()">Login to Dashboard</button>
