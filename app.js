@@ -69,6 +69,13 @@ if (typeof window !== 'undefined') {
       ADCMSCabinDefects.init();
     }
   }
+  const { ADCMSMCCCenter } = window;
+  if (ADCMSMCCCenter && typeof document !== 'undefined') {
+    const shouldInitMCC = document.getElementById('mccMelList') || window.location.pathname.includes('mcc-center.html');
+    if (shouldInitMCC) {
+      ADCMSMCCCenter.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {

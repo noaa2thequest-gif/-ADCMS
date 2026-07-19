@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — MCC Center</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .mcc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      gap: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--accent) 0%, rgba(var(--accent-rgb), 0.7) 100%);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .mcc-header h2 {
+      margin: 0;
+    }
+
+    .mcc-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .mcc-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      transition: all 0.3s;
+      border: 2px solid white;
+    }
+
+    .mcc-actions button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .mcc-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background-color: var(--bg-secondary);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      border-top: 4px solid var(--accent);
+    }
+
+    .stat-card h4 {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .mcc-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1200px) {
+      .mcc-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mcc-section {
+      background-color: var(--bg-secondary);
+      padding: 25px;
+      border-radius: 12px;
+      border-top: 4px solid var(--accent);
+    }
+
+    .mcc-section h3 {
+      margin: 0 0 20px 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .mel-item-mcc {
+      background-color: var(--bg-primary);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      border-left: 4px solid #ff9800;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .mel-item-mcc.critical {
+      border-left-color: #ff5252;
+      background-color: rgba(255, 82, 82, 0.05);
+    }
+
+    .mel-item-mcc.warning {
+      border-left-color: #ffc107;
+      background-color: rgba(255, 193, 7, 0.05);
+    }
+
+    .mel-info {
+      flex-grow: 1;
+    }
+
+    .mel-info h5 {
+      margin: 0 0 5px 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .mel-info p {
+      margin: 3px 0;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .mel-countdown {
+      text-align: right;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 8px 12px;
+      background-color: var(--accent);
+      color: white;
+      border-radius: 4px;
+      min-width: 80px;
+    }
+
+    .mel-countdown.critical {
+      background-color: #ff5252;
+    }
+
+    .aircraft-status-mcc {
+      background-color: var(--bg-primary);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .aircraft-info-mcc {
+      flex-grow: 1;
+    }
+
+    .aircraft-info-mcc h5 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .aircraft-info-mcc small {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    .status-badge-mcc {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-serviceable { background: #e8f5e9; color: #2e7d32; }
+    .badge-deferred { background: #fff3e0; color: #e65100; }
+    .badge-aog { background: #ffebee; color: #c62828; }
+
+    .mcc-actions-inline {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .mcc-actions-inline button {
+      flex: 1;
+      padding: 6px;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-edit-mel {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .btn-edit-mel:hover {
+      opacity: 0.8;
+    }
+
+    .btn-remove-mel {
+      background-color: #ff5252;
+      color: white;
+    }
+
+    .btn-remove-mel:hover {
+      opacity: 0.8;
+    }
+
+    .mcc-empty {
+      text-align: center;
+      color: var(--text-dim);
+      padding: 30px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✈</div>
+        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
+      </div>
+      <nav>
+        <a href="index.html">⌂ <span>Fleet Overview</span></a>
+        <a class="active" href="mcc-center.html">🎛️ <span>MCC Center</span></a>
+        <a href="mel.html">▤ <span>MEL Management</span></a>
+        <a href="reports.html">◩ <span>Reports</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
+        <small id="appVersion">Version 1.3 (Build 13)<br>© 2026 ADCMS</small>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <button class="menu" id="menuBtn">☰</button>
+        <div class="profile"><span class="bell">♧<b>8</b></span><div class="avatar">H</div><div><strong>Hany Omar</strong><small>MCC Engineer</small></div></div>
+      </header>
+
+      <section class="content">
+        <div class="mcc-header">
+          <div>
+            <h2>🎛️ Maintenance Control Center</h2>
+            <p style="margin: 5px 0 0 0; opacity: 0.9;">Real-time MEL monitoring and aircraft status</p>
+          </div>
+          <div class="mcc-actions">
+            <button onclick="location.reload()">🔄 Refresh</button>
+            <button onclick="ADCMSMCCCenter.sendReport()">📧 Send Report</button>
+          </div>
+        </div>
+
+        <!-- MCC Statistics -->
+        <div class="mcc-stats">
+          <div class="stat-card">
+            <h4>Total Aircraft</h4>
+            <div class="value" id="mccTotalAircraft">0</div>
+          </div>
+          <div class="stat-card">
+            <h4>Serviceable</h4>
+            <div class="value" id="mccServiceable">0</div>
+          </div>
+          <div class="stat-card">
+            <h4>Active MELs</h4>
+            <div class="value" id="mccActiveMels">0</div>
+          </div>
+          <div class="stat-card">
+            <h4>Critical (≤1 day)</h4>
+            <div class="value" id="mccCritical">0</div>
+          </div>
+        </div>
+
+        <!-- MCC Main Content -->
+        <div class="mcc-content">
+          <!-- MEL Monitoring -->
+          <div class="mcc-section">
+            <h3>📋 Active MEL Items</h3>
+            <div id="mccMelList" class="mcc-empty">Loading MEL data...</div>
+          </div>
+
+          <!-- Aircraft Status -->
+          <div class="mcc-section">
+            <h3>✈️ Fleet Status</h3>
+            <div id="mccAircraftList" class="mcc-empty">Loading aircraft data...</div>
+          </div>
+        </div>
+
+        <!-- Critical Alerts -->
+        <div class="mcc-section">
+          <h3>⚠️ Critical Alerts</h3>
+          <div id="mccAlerts" class="mcc-empty">No critical alerts at this time.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="modules/data.js"></script>
+  <script src="modules/ui.js"></script>
+  <script src="modules/mcc-center.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
