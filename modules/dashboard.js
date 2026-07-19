@@ -15,9 +15,9 @@
     grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">Loading fleet data...</p>';
     
     try {
-      const aircraftList = await data.getAircraft();
+      const aircraftList = await data.getAircraft() || [];
       
-      if (!aircraftList || aircraftList.length === 0) {
+      if (aircraftList.length === 0) {
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">No aircraft found. Add your first aircraft in Administration.</p>';
         return;
       }

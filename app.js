@@ -4,8 +4,12 @@ if (typeof window !== 'undefined') {
     try {
       // 1. Initialize Cloud Connection
       if (window.ADCMSData && typeof window.ADCMSData.initCloud === 'function') {
-        await window.ADCMSData.initCloud();
-        console.log('☁️ Cloud initialization completed');
+        try {
+          await window.ADCMSData.initCloud();
+          console.log('☁️ Cloud initialization completed');
+        } catch (e) {
+          console.warn('Cloud init failed, falling back to local');
+        }
       }
       
       // 2. Security Check
