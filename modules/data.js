@@ -42,11 +42,18 @@
   const defaultWorkflowState = {
     activeDefect: null,
     history: [],
-    defects: []
+    defects: [
+      { id: 'def-1', aircraft: 'SU-VIS', issue: 'Left Landing Light Inop', source: 'Medium', reportedAt: new Date().toISOString(), status: 'open', isMEL: true, melCategory: 'C', melExpiry: '2026-07-25' },
+      { id: 'def-2', aircraft: 'SU-ION', issue: 'Engine #1 Fuel Leak', source: 'AOG', reportedAt: new Date().toISOString(), status: 'open', isMEL: false }
+    ]
   };
 
-  // Default aircraft data - Empty by default, user adds their own
-  const defaultAircraft = [];
+  // Default aircraft data for demo purposes
+  const defaultAircraft = [
+    { id: 'ac-1', registration: 'SU-SKY', model: 'A320-200', msn: '5432', engines: 'V2500', status: 'SERVICEABLE', location: 'CAI', openDefects: 0, melItems: 0, lastUpdate: 'Just now' },
+    { id: 'ac-2', registration: 'SU-VIS', model: 'B737-800', msn: '2876', engines: 'CFM56', status: 'DEFERRED', location: 'JED', openDefects: 2, melItems: 1, lastUpdate: '2h ago' },
+    { id: 'ac-3', registration: 'SU-ION', model: 'A330-300', msn: '1298', engines: 'Trent 700', status: 'AOG', location: 'DXB', openDefects: 1, melItems: 0, lastUpdate: '10m ago' }
+  ];
 
   function loadState() {
     if (typeof localStorage === 'undefined') {
