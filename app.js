@@ -48,6 +48,13 @@ if (typeof window !== 'undefined') {
       ADCMSAircraftStatus.init();
     }
   }
+  const { ADCMSSurveillance } = window;
+  if (ADCMSSurveillance && typeof document !== 'undefined') {
+    const shouldInitSurveillance = document.getElementById('safaAircraft') || window.location.pathname.includes('surveillance.html');
+    if (shouldInitSurveillance) {
+      ADCMSSurveillance.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
