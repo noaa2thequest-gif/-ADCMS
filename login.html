@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .login-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .login-logo {
+      font-size: 40px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .login-container h2 {
+      color: #fff;
+      margin-bottom: 5px;
+      font-size: 24px;
+    }
+
+    .login-container p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #4e54c8;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #4e54c8, #8f94fb);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    .login-footer {
+      margin-top: 25px;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+    }
+
+    .error-msg {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-logo">✈</div>
+    <h2>ADCMS</h2>
+    <p>Aircraft Defect & Maintenance Control</p>
+    
+    <div id="errorMsg" class="error-msg">Invalid email or password.</div>
+
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="hany@adcms.com" />
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" />
+    </div>
+
+    <button class="login-btn" onclick="ADCMSAuth.login()">Login to Dashboard</button>
+
+    <div class="login-footer">
+      © 2026 ADCMS - Secure Access Only
+    </div>
+  </div>
+
+  <script src="modules/data.js"></script>
+  <script src="modules/auth.js"></script>
+</body>
+</html>

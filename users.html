@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — User Management</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--bg-secondary);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .users-table th {
+      background-color: var(--bg-primary);
+      padding: 15px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .users-table td {
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .role-select {
+      padding: 6px;
+      border-radius: 4px;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-approve {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✈</div>
+        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
+      </div>
+      <nav>
+        <a href="index.html">⌂ <span>Fleet Overview</span></a>
+        <a class="active" href="users.html">👤 <span>User Management</span></a>
+        <a href="admin.html">⚙ <span>Administration</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <button onclick="ADCMSAuth.logout()">⎗ <span>Logout</span></button>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <button class="menu" id="menuBtn">☰</button>
+        <div class="profile"><div class="avatar">H</div><div><strong>Hany Omar</strong><small>Super Admin</small></div></div>
+      </header>
+
+      <section class="content">
+        <h2>👤 User Management</h2>
+        <p style="color: var(--text-dim);">Approve new users and assign roles</p>
+
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Current Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="usersList">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="modules/data.js"></script>
+  <script src="modules/auth.js"></script>
+  <script src="modules/ui.js"></script>
+  <script>
+    function renderUsers() {
+      const list = document.getElementById('usersList');
+      const users = ADCMSAuth.getUsers();
+
+      list.innerHTML = users.map(user => `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>
+            <select class="role-select" onchange="updateRole('${user.email}', this.value)">
+              <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+              <option value="mcc" ${user.role === 'mcc' ? 'selected' : ''}>MCC Engineer</option>
+              <option value="engineer" ${user.role === 'engineer' ? 'selected' : ''}>Maintenance Engineer</option>
+              <option value="cabin" ${user.role === 'cabin' ? 'selected' : ''}>Cabin Engineer</option>
+              <option value="auditor" ${user.role === 'auditor' ? 'selected' : ''}>Auditor</option>
+              <option value="warehouse" ${user.role === 'warehouse' ? 'selected' : ''}>Store Keeper</option>
+            </select>
+          </td>
+          <td>
+            <span style="color: ${user.approved ? '#4caf50' : '#ff9800'}">
+              ${user.approved ? 'Approved ✅' : 'Pending ⏳'}
+            </span>
+          </td>
+          <td>
+            ${!user.approved ? `<button class="btn-approve" onclick="approveUser('${user.email}')">Approve</button>` : ''}
+            <button class="btn-save" onclick="alert('Changes saved for ${user.name}')">Save</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateRole(email, newRole) {
+      const users = ADCMSAuth.getUsers();
+      const user = users.find(u => u.email === email);
+      if (user) {
+        user.role = newRole;
+        ADCMSAuth.saveUsers(users);
+      }
+    }
+
+    function approveUser(email) {
+      const users = ADCMSAuth.getUsers();
+      const user = users.find(u => u.email === email);
+      if (user) {
+        user.approved = true;
+        ADCMSAuth.saveUsers(users);
+        renderUsers();
+      }
+    }
+
+    window.onload = () => {
+      ADCMSAuth.checkAccess();
+      renderUsers();
+    };
+  </script>
+</body>
+</html>

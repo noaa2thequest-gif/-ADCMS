@@ -1,4 +1,9 @@
 if (typeof window !== 'undefined') {
+  // Security Check
+  if (window.ADCMSAuth) {
+    window.ADCMSAuth.checkAccess();
+  }
+
   const { ADCMSUI } = window;
   const { ADCMSDashboard } = window;
   const { ADCMSWorkflow } = window;
