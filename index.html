@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ADCMS — Fleet Overview</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
 </head>
 <body>
   <div class="app">
@@ -31,11 +33,13 @@
         <a href="reports.html">◩ <span>Reports</span></a>
         <a href="notifications.html">♧ <span>Notifications</span><b>8</b></a>
         <a href="admin.html">⚙ <span>Administration</span></a>
+        <a href="users.html">👤 <span>User Management</span></a>
         <a href="audit.html">▧ <span>Audit Log</span></a>
       </nav>
 
       <div class="sidebar-footer">
         <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
+        <button onclick="ADCMSAuth.logout()">⎗ <span>Logout</span></button>
         <small id="appVersion">Version 1.0 (Prototype)<br>© 2025 ADCMS</small>
       </div>
     </aside>
@@ -190,7 +194,9 @@
   </div>
 
   <!-- ========== SCRIPTS ========== -->
+  <script src="modules/supabase-config.js"></script>
   <script src="modules/data.js"></script>
+  <script src="modules/auth.js"></script>
   <script src="modules/ui.js"></script>
   <script src="modules/dashboard.js"></script>
   <script src="app.js"></script>
