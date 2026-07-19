@@ -6,6 +6,13 @@
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
   const data = root.ADCMSData || require('./data');
+  
+  // Supabase Configuration
+  const SUPABASE_URL = 'https://tfgioiziknxqrfrodkkc.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_9hZupGiWDWs2k5p_rJYt7g_x6aezzRl';
+  
+  let supabase = null;
+  let useCloud = false;
 
   // Initial users if none exist
   const defaultUsers = [
@@ -13,22 +20,75 @@
     { email: 'mcc@adcms.com', password: '123', name: 'MCC Team', role: 'mcc', approved: true },
     { email: 'eng@adcms.com', password: '123', name: 'Engineer', role: 'engineer', approved: true }
   ];
+  
+  // Initialize Supabase
+  const initSupabase = async () => {
+    if (window.supabase && !supabase) {
+      try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        useCloud = true;
+        console.log('✅ Supabase Auth initialized');
+        return true;
+      } catch (error) {
+        console.error('❌ Supabase Auth init failed:', error);
+        useCloud = false;
+        return false;
+      }
+    }
+    return false;
+  };
+  
+  // Auto-initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSupabase);
+  } else {
+    initSupabase();
+  }
 
-  function getUsers() {
+  async function getUsers() {
+    if (useCloud && supabase) {
+      try {
+        const { data: users, error } = await supabase
+          .from('users')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        if (users && users.length > 0) return users;
+      } catch (error) {
+        console.warn('⚠️ Cloud user fetch failed:', error);
+      }
+    }
+    
+    // Fallback to localStorage
     const users = localStorage.getItem('adcms_users');
     return users ? JSON.parse(users) : defaultUsers;
   }
 
-  function saveUsers(users) {
+  async function saveUsers(users) {
+    if (useCloud && supabase) {
+      try {
+        const { error } = await supabase
+          .from('users')
+          .upsert(users, { onConflict: 'email' });
+        
+        if (error) throw error;
+        console.log('✅ Users saved to cloud');
+      } catch (error) {
+        console.warn('⚠️ Cloud user save failed:', error);
+      }
+    }
+    
+    // Always save to localStorage as fallback
     localStorage.setItem('adcms_users', JSON.stringify(users));
   }
 
-  function login() {
+  async function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const errorMsg = document.getElementById('errorMsg');
 
-    const users = getUsers();
+    const users = await getUsers();
     const user = users.find(u => u.email === email && u.password === password);
 
     if (user) {
@@ -47,12 +107,37 @@
 
   function logout() {
     localStorage.removeItem('adcms_logged_in_user');
+    if (useCloud && supabase) {
+      supabase.auth.signOut().catch(e => console.warn('Signout warning:', e));
+    }
     window.location.href = 'login.html';
   }
 
   function getCurrentUser() {
     const user = localStorage.getItem('adcms_logged_in_user');
     return user ? JSON.parse(user) : null;
+  }
+  
+  async function getCurrentUserAsync() {
+    const user = getCurrentUser();
+    if (user) return user;
+    
+    if (useCloud && supabase) {
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data: userData } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', authUser.email)
+            .single();
+          return userData;
+        }
+      } catch (error) {
+        console.warn('⚠️ Cloud user fetch failed:', error);
+      }
+    }
+    return null;
   }
 
   function checkAccess() {
@@ -89,8 +174,10 @@
     login,
     logout,
     getCurrentUser,
+    getCurrentUserAsync,
     checkAccess,
     getUsers,
-    saveUsers
+    saveUsers,
+    initCloud: initSupabase
   };
 });

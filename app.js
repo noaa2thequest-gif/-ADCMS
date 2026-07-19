@@ -1,4 +1,12 @@
 if (typeof window !== 'undefined') {
+  // Initialize Cloud Connection
+  (async () => {
+    if (window.ADCMSData && typeof window.ADCMSData.initCloud === 'function') {
+      await window.ADCMSData.initCloud();
+      console.log('☁️ Cloud initialization completed');
+    }
+  })();
+  
   // Security Check
   if (window.ADCMSAuth) {
     window.ADCMSAuth.checkAccess();
