@@ -55,6 +55,13 @@ if (typeof window !== 'undefined') {
       ADCMSSurveillance.init();
     }
   }
+  const { ADCMSReports } = window;
+  if (ADCMSReports && typeof document !== 'undefined') {
+    const shouldInitReports = document.getElementById('summaryGrid') || window.location.pathname.includes('reports.html');
+    if (shouldInitReports) {
+      ADCMSReports.init();
+    }
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
