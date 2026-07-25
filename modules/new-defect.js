@@ -178,20 +178,19 @@
       createdAt: new Date().toISOString()
     };
 
-    // Save to data store
-    if (!data.workflowState.defects) {
-      data.workflowState.defects = [];
-    }
-    data.workflowState.defects.push(newDefect);
-    data.persistState();
+    // Save to data store using the correct API
+    data.addDefect(newDefect).then(function() {
+      // Show success message
+      alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue + (isMel ? '\n\nMEL Category: ' + melCategory + '\nExpiry: ' + melExpiry : ''));
 
-    // Show success message
-    alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue + (isMel ? '\n\nMEL Category: ' + melCategory + '\nExpiry: ' + melExpiry : ''));
-
-    // Redirect to defect workflow
-    setTimeout(function() {
-      window.location.href = 'defect.html?defectId=' + newDefect.id;
-    }, 500);
+      // Redirect to defect workflow
+      setTimeout(function() {
+        window.location.href = 'defect.html?defectId=' + newDefect.id;
+      }, 500);
+    }).catch(function(error) {
+      console.error('Error saving defect:', error);
+      alert('❌ Error saving defect. Please try again.');
+    });
   }
 
   // Initialize function using Promise-based approach
