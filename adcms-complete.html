@@ -32,6 +32,27 @@
       height: 100vh;
       left: 0;
       top: 0;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+    
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #1e40af;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 24px;
+      cursor: pointer;
+      border-radius: 5px;
+      z-index: 1001;
     }
     
     .sidebar h1 {
@@ -328,26 +349,102 @@
     
     /* RESPONSIVE */
     @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      
       .sidebar {
         width: 100%;
-        height: auto;
-        position: relative;
+        height: 100vh;
+        padding: 60px 20px 20px 20px;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.hidden {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar h1 {
+        font-size: 20px;
+      }
+      
+      .sidebar p {
+        font-size: 11px;
       }
       
       .main-content {
         margin-left: 0;
+        margin-top: 0;
+      }
+      
+      .header {
+        padding: 15px 20px;
+        margin-top: 0;
+      }
+      
+      .header h2 {
+        font-size: 22px;
+      }
+      
+      .content {
+        padding: 15px;
       }
       
       .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .stat-card {
+        padding: 15px;
+      }
+      
+      .stat-card .number {
+        font-size: 24px;
+      }
+      
+      .form-section {
+        padding: 20px;
+        max-width: 100%;
+      }
+      
+      .section-title {
+        font-size: 14px;
+        margin-top: 20px;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+      }
+      
+      table {
+        font-size: 13px;
+      }
+      
+      th, td {
+        padding: 10px 8px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button {
+        padding: 10px 15px;
+        font-size: 14px;
       }
     }
   </style>
 </head>
 <body>
+  <button class="menu-toggle" id="menuToggle">☰</button>
   <div class="app-container">
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar hidden" id="sidebar">
       <h1>✈️ ADCMS Pro</h1>
       <p>Aircraft Defect & Maintenance Control System</p>
       
@@ -543,6 +640,25 @@
   </div>
 
   <script>
+    // MOBILE MENU TOGGLE
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+      menuToggle.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+    });
+    
+    // Close menu when clicking nav item on mobile
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open');
+          menuToggle.textContent = '☰';
+        }
+      });
+    });
+    
     // PAGE NAVIGATION
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -559,10 +675,10 @@
       document.getElementById(pageName).classList.add('active');
       
       const titles = {
-        'dashboard': 'Dashboard',
-        'create-defect': 'Create New Defect',
-        'view-defects': 'View Defects',
-        'mel': 'MEL Management'
+        'dashboard': '📊 Dashboard',
+        'create-defect': '➕ Create Defect',
+        'view-defects': '🔧 View Defects',
+        'mel': '📋 MEL Management'
       };
       document.getElementById('pageTitle').textContent = titles[pageName] || 'Dashboard';
       
@@ -685,13 +801,14 @@
       
       const recentTable = document.getElementById('recentDefectsTable');
       const recent = defects.slice(-5).reverse();
+      const aircraftMap = { 1: 'SU-SKH', 2: 'SU-SKI', 3: 'SU-SKJ', 4: 'SU-SKK' };
       
       if (recent.length === 0) {
         recentTable.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">No defects yet</td></tr>';
       } else {
         recentTable.innerHTML = recent.map(d => `
           <tr>
-            <td>SU-SKH</td>
+            <td>${aircraftMap[d.aircraftId] || 'N/A'}</td>
             <td>${d.title}</td>
             <td>${d.date}</td>
             <td><span class="badge badge-${d.status.toLowerCase()}">${d.status}</span></td>
@@ -707,10 +824,11 @@
       if (defects.length === 0) {
         table.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No defects yet</td></tr>';
       } else {
+        const aircraftMap = { 1: 'SU-SKH', 2: 'SU-SKI', 3: 'SU-SKJ', 4: 'SU-SKK' };
         table.innerHTML = defects.map(d => `
           <tr>
             <td>#${d.id}</td>
-            <td>SU-SKH</td>
+            <td>${aircraftMap[d.aircraftId] || 'N/A'}</td>
             <td>${d.title}</td>
             <td>${d.date}</td>
             <td><span class="badge badge-${d.status.toLowerCase()}">${d.status}</span></td>
@@ -726,10 +844,11 @@
       if (mels.length === 0) {
         table.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No MEL items yet</td></tr>';
       } else {
+        const aircraftMap = { 1: 'SU-SKH', 2: 'SU-SKI', 3: 'SU-SKJ', 4: 'SU-SKK' };
         table.innerHTML = mels.map(m => `
           <tr>
             <td>#${m.id}</td>
-            <td>SU-SKH</td>
+            <td>${aircraftMap[m.aircraftId] || 'N/A'}</td>
             <td>${m.category}</td>
             <td>${m.expiry}</td>
             <td><span class="badge badge-${m.status.toLowerCase()}">${m.status}</span></td>
