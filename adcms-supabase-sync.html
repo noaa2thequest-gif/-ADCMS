@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS Pro - Real-time Sync</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .app-container { display: flex; min-height: 100vh; }
+    .sidebar { width: 280px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 20px; overflow-y: auto; position: fixed; height: 100vh; left: 0; top: 0; z-index: 1000; }
+    .sidebar h1 { font-size: 24px; margin-bottom: 5px; }
+    .sidebar p { font-size: 12px; opacity: 0.9; margin-bottom: 30px; }
+    .nav-menu { list-style: none; }
+    .nav-menu li { margin-bottom: 10px; }
+    .nav-menu button { width: 100%; padding: 12px 15px; background: transparent; color: white; border: none; border-radius: 5px; text-align: left; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .nav-menu button:hover { background: rgba(255,255,255,0.1); }
+    .nav-menu button.active { background: rgba(255,255,255,0.2); font-weight: 600; }
+    .main-content { margin-left: 280px; flex: 1; display: flex; flex-direction: column; }
+    .header { background: white; padding: 20px 30px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .header h2 { font-size: 28px; color: #1e40af; }
+    .status { padding: 8px 15px; background: #d4edda; color: #155724; border-radius: 5px; font-size: 12px; font-weight: 600; }
+    .content { flex: 1; padding: 30px; overflow-y: auto; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+    input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; font-family: inherit; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+    button { padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; background: #1e40af; color: white; }
+    button:hover { background: #1e3a8a; }
+    .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+    .alert.success { background: #d4edda; color: #155724; }
+    .alert.error { background: #f8d7da; color: #721c24; }
+    table { width: 100%; border-collapse: collapse; }
+    table th { background: #f8f9fa; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }
+    table td { padding: 12px; border-bottom: 1px solid #ddd; }
+    table tr:hover { background: #f8f9fa; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <h1>✈️ ADCMS Pro</h1>
+      <p>Real-time Database Sync</p>
+      <ul class="nav-menu">
+        <li><button class="nav-btn active" data-page="dashboard">📊 Dashboard</button></li>
+        <li><button class="nav-btn" data-page="create-defect">➕ Create Defect</button></li>
+        <li><button class="nav-btn" data-page="all-defects">📋 All Defects</button></li>
+      </ul>
+    </aside>
+    
+    <div class="main-content">
+      <header class="header">
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="status" id="status">🔄 Syncing...</div>
+      </header>
+      
+      <div class="content">
+        <div id="dashboard" class="page active">
+          <div id="dashboardContent"></div>
+        </div>
+        
+        <div id="create-defect" class="page">
+          <div class="card">
+            <h3 style="color: #1e40af; margin-bottom: 20px;">➕ Create New Defect</h3>
+            <div id="createAlert" class="alert"></div>
+            <form id="defectForm" onsubmit="submitDefect(event)">
+              <div class="form-group">
+                <label>Aircraft:</label>
+                <select id="aircraft" required>
+                  <option value="">-- Select Aircraft --</option>
+                  <option value="SU-SKH">SU-SKH</option>
+                  <option value="SU-SKI">SU-SKI</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Defect Title:</label>
+                <input type="text" id="defectTitle" placeholder="e.g., Hydraulic pump noise" required />
+              </div>
+              <div class="form-group">
+                <label>Description:</label>
+                <textarea id="description" placeholder="Describe the defect" required></textarea>
+              </div>
+              <div class="form-group">
+                <label>Reported By:</label>
+                <input type="text" id="reportedBy" placeholder="e.g., John Smith" required />
+              </div>
+              <button type="submit">✅ Submit to Database</button>
+            </form>
+          </div>
+        </div>
+        
+        <div id="all-defects" class="page">
+          <div class="card">
+            <h3 style="color: #1e40af; margin-bottom: 20px;">📋 All Defects</h3>
+            <div id="defectsTable"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let supabase = null;
+    let defects = [];
+    
+    window.addEventListener('load', async function() {
+      const url = localStorage.getItem('supabaseUrl');
+      const key = localStorage.getItem('supabaseKey');
+      
+      if (!url || !key) {
+        window.location.href = '/adcms-supabase.html';
+        return;
+      }
+      
+      try {
+        const { createClient } = window.supabase;
+        supabase = createClient(url, key);
+        
+        document.getElementById('status').textContent = '✅ Connected';
+        document.getElementById('status').style.background = '#d4edda';
+        
+        await loadDefects();
+        
+        supabase.channel('defects-channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'defects' }, (payload) => {
+            loadDefects();
+          })
+          .subscribe();
+        
+      } catch (error) {
+        document.getElementById('status').textContent = '❌ Error';
+        document.getElementById('status').style.background = '#f8d7da';
+      }
+    });
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const page = this.dataset.page;
+        showPage(page);
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageName).classList.add('active');
+      
+      const titles = {
+        'dashboard': '📊 Dashboard',
+        'create-defect': '➕ Create Defect',
+        'all-defects': '📋 All Defects'
+      };
+      document.getElementById('pageTitle').textContent = titles[pageName];
+      
+      if (pageName === 'all-defects') {
+        renderDefectsTable();
+      }
+    }
+    
+    async function loadDefects() {
+      try {
+        const { data, error } = await supabase.from('defects').select('*');
+        if (error) throw error;
+        defects = data || [];
+        renderDashboard();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+    
+    function renderDashboard() {
+      const html = `
+        <div class="card">
+          <h3 style="color: #1e40af; margin-bottom: 20px;">📊 Statistics</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="padding: 20px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #1e40af;">
+              <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Total Defects</div>
+              <div style="color: #1e40af; font-size: 32px; font-weight: 600;">${defects.length}</div>
+            </div>
+            <div style="padding: 20px; background: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+              <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Open Defects</div>
+              <div style="color: #ff9800; font-size: 32px; font-weight: 600;">${defects.filter(d => d.status === 'Open').length}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3 style="color: #1e40af; margin-bottom: 20px;">📋 Recent Defects</h3>
+          ${defects.length === 0 ? '<p style="color: #999;">No defects yet</p>' : `
+            <table>
+              <thead>
+                <tr>
+                  <th>Aircraft</th>
+                  <th>Title</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${defects.slice(0, 5).map(d => `
+                  <tr>
+                    <td>${d.aircraft}</td>
+                    <td>${d.title}</td>
+                    <td>${d.date}</td>
+                    <td><span style="padding: 4px 8px; background: #fff3e0; color: #ff9800; border-radius: 3px; font-size: 12px;">${d.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `}
+        </div>
+      `;
+      document.getElementById('dashboardContent').innerHTML = html;
+    }
+    
+    function renderDefectsTable() {
+      const html = defects.length === 0 ? '<p style="color: #999;">No defects yet</p>' : `
+        <table>
+          <thead>
+            <tr>
+              <th>Aircraft</th>
+              <th>Title</th>
+              <th>Reported By</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${defects.map(d => `
+              <tr>
+                <td>${d.aircraft}</td>
+                <td>${d.title}</td>
+                <td>${d.reported_by}</td>
+                <td>${d.date}</td>
+                <td><span style="padding: 4px 8px; background: #fff3e0; color: #ff9800; border-radius: 3px; font-size: 12px;">${d.status}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      document.getElementById('defectsTable').innerHTML = html;
+    }
+    
+    async function submitDefect(e) {
+      e.preventDefault();
+      
+      const defectData = {
+        aircraft: document.getElementById('aircraft').value,
+        title: document.getElementById('defectTitle').value,
+        description: document.getElementById('description').value,
+        reported_by: document.getElementById('reportedBy').value,
+        date: new Date().toISOString().split('T')[0],
+        status: 'Open'
+      };
+      
+      try {
+        const { error } = await supabase.from('defects').insert([defectData]);
+        if (error) throw error;
+        
+        showAlert('createAlert', 'success', '✅ Defect saved to Supabase!');
+        document.getElementById('defectForm').reset();
+        await loadDefects();
+      } catch (error) {
+        showAlert('createAlert', 'error', '❌ Error: ' + error.message);
+      }
+    }
+    
+    function showAlert(elementId, type, message) {
+      const alert = document.getElementById(elementId);
+      alert.textContent = message;
+      alert.className = `alert ${type}`;
+      alert.style.display = 'block';
+      
+      setTimeout(() => {
+        alert.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
