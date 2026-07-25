@@ -99,7 +99,6 @@
         // Reset extension if category changes
         hasExtension.checked = false;
         extensionSection.style.display = 'none';
-        extensionType.value = '';
         melExpiryExtended.value = '';
       }
     };
@@ -116,20 +115,16 @@
       }
     });
 
-    // Calculate extension expiry - Auto-suggest but allow manual change
+    // Calculate extension expiry
     extensionType.addEventListener('change', function() {
       if (extensionType.value && melExpiry.value) {
-        // If it's the second concession, we might want to extend from the first extended date
-        const baseDate = (extensionType.value === 'second' && melExpiryExtended.value) 
-                        ? melExpiryExtended.value 
-                        : melExpiry.value;
-                        
-        const newExpiry = calculateExtensionExpiry(baseDate, extensionType.value);
+        const newExpiry = calculateExtensionExpiry(melExpiry.value, extensionType.value);
         melExpiryExtended.value = newExpiry || '';
       }
     });
   }
 
+  // Save defect to Firebase
   function saveDefect() {
     const aircraft = document.getElementById('newDefectAircraft').value;
     const issue = document.getElementById('newDefectIssue').value;
@@ -178,20 +173,19 @@
       createdAt: new Date().toISOString()
     };
 
-    // Save to data store
-    if (!data.workflowState.defects) {
-      data.workflowState.defects = [];
-    }
-    data.workflowState.defects.push(newDefect);
-    data.persistState();
+    // Save to Firebase using the correct method
+    data.addDefect(newDefect).then(function() {
+      // Show success message
+      alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue + (isMel ? '\n\nMEL Category: ' + melCategory + '\nExpiry: ' + melExpiry : ''));
 
-    // Show success message
-    alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue + (isMel ? '\n\nMEL Category: ' + melCategory + '\nExpiry: ' + melExpiry : ''));
-
-    // Redirect to defect workflow
-    setTimeout(function() {
-      window.location.href = 'defect.html?defectId=' + newDefect.id;
-    }, 500);
+      // Redirect to defect workflow
+      setTimeout(function() {
+        window.location.href = 'defect.html?defectId=' + newDefect.id;
+      }, 500);
+    }).catch(function(error) {
+      console.error('Error saving defect:', error);
+      alert('❌ Error saving defect. Please try again.');
+    });
   }
 
   // Initialize function using Promise-based approach
