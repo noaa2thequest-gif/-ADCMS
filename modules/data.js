@@ -6,7 +6,23 @@
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
   
-  // Helper to calculate MEL expiry
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUMuUM-CSRsT4u8hlQ4YtWQNK69F3weSc",
+    authDomain: "adcms-realtime.firebaseapp.com",
+    databaseURL: "https://adcms-realtime-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "adcms-realtime",
+    storageBucket: "adcms-realtime.firebasestorage.app",
+    messagingSenderId: "197073995350",
+    appId: "1:197073995350:web:74462049fc06b354dd9df7",
+    measurementId: "G-E5VDB5XQCS"
+  };
+
+  let db = null;
+  let aircraftFleet = [];
+  let defectsList = [];
+  let inventoryList = [];
+  let cabinDefects = [];
+
   function calculateMelExpiry(openDate, melCategory) {
     if (!openDate || !melCategory) return null;
     const date = new Date(openDate);
@@ -22,95 +38,121 @@
     return date.toISOString().split('T')[0];
   }
 
-  // Load from localStorage - NO DEFAULT DATA
-  function loadFromLocalStorage(key) {
+  async function initFirebase() {
     try {
-      const stored = localStorage.getItem(key);
-      return stored ? JSON.parse(stored) : [];
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+      const { getDatabase, ref, get, set, remove } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+      
+      const app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
+
+      // Load all data from Firebase
+      const dbRef = ref(db);
+      const snapshot = await get(dbRef);
+      
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        aircraftFleet = data.aircraft ? Object.values(data.aircraft) : [];
+        defectsList = data.defects ? Object.values(data.defects) : [];
+        inventoryList = data.stores ? Object.values(data.stores) : [];
+        cabinDefects = data.cabinDefects ? Object.values(data.cabinDefects) : [];
+      }
+
+      console.log('✅ Firebase loaded successfully');
+      return true;
     } catch (e) {
-      console.warn(`Failed to load ${key}:`, e);
-      return [];
+      console.error('Firebase init error:', e);
+      return false;
     }
   }
 
-  // Data storage - START EMPTY
-  let aircraftFleet = loadFromLocalStorage('adcms-aircraft');
-  let defectsList = loadFromLocalStorage('adcms-defects');
-  let inventoryList = loadFromLocalStorage('adcms-inventory');
-  let cabinDefects = loadFromLocalStorage('adcms-cabin-defects');
-
-  function persist() {
+  async function saveToFirebase() {
+    if (!db) return;
     try {
-      localStorage.setItem('adcms-aircraft', JSON.stringify(aircraftFleet));
-      localStorage.setItem('adcms-defects', JSON.stringify(defectsList));
-      localStorage.setItem('adcms-inventory', JSON.stringify(inventoryList));
-      localStorage.setItem('adcms-cabin-defects', JSON.stringify(cabinDefects));
+      const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+      
+      const data = {
+        aircraft: {},
+        defects: {},
+        stores: {},
+        cabinDefects: {}
+      };
+
+      aircraftFleet.forEach((ac, i) => {
+        data.aircraft[ac.id || `ac-${i}`] = ac;
+      });
+      defectsList.forEach((def, i) => {
+        data.defects[def.id || `def-${i}`] = def;
+      });
+      inventoryList.forEach((inv, i) => {
+        data.stores[inv.id || `inv-${i}`] = inv;
+      });
+      cabinDefects.forEach((cd, i) => {
+        data.cabinDefects[cd.id || `cd-${i}`] = cd;
+      });
+
+      await set(ref(db), data);
     } catch (e) {
-      console.warn('Failed to persist data:', e);
+      console.warn('Firebase save error:', e);
     }
   }
 
   return {
-    initCloud: async () => true,
+    initCloud: initFirebase,
 
-    // Aircraft
     getAircraft: () => aircraftFleet,
     addAircraft: (aircraft) => {
       aircraftFleet.push(aircraft);
-      persist();
+      saveToFirebase();
     },
     updateAircraft: (id, updates) => {
       const idx = aircraftFleet.findIndex(a => a.id === id);
       if (idx !== -1) {
         aircraftFleet[idx] = { ...aircraftFleet[idx], ...updates };
-        persist();
+        saveToFirebase();
       }
     },
     deleteAircraft: (id) => {
       aircraftFleet = aircraftFleet.filter(a => a.id !== id);
-      persist();
+      saveToFirebase();
     },
 
-    // Defects
     getDefects: () => defectsList,
     addDefect: (defect) => {
       defectsList.push(defect);
-      persist();
+      saveToFirebase();
     },
     updateDefect: (id, updates) => {
       const idx = defectsList.findIndex(d => d.id === id);
       if (idx !== -1) {
         defectsList[idx] = { ...defectsList[idx], ...updates };
-        persist();
+        saveToFirebase();
       }
     },
     deleteDefect: (id) => {
       defectsList = defectsList.filter(d => d.id !== id);
-      persist();
+      saveToFirebase();
     },
 
-    // Inventory
     getInventory: () => inventoryList,
     addInventoryItem: (item) => {
       inventoryList.push(item);
-      persist();
+      saveToFirebase();
     },
     updateInventoryItem: (id, updates) => {
       const idx = inventoryList.findIndex(i => i.id === id);
       if (idx !== -1) {
         inventoryList[idx] = { ...inventoryList[idx], ...updates };
-        persist();
+        saveToFirebase();
       }
     },
 
-    // Cabin defects
     getCabinDefects: () => cabinDefects,
     addCabinDefect: (defect) => {
       cabinDefects.push(defect);
-      persist();
+      saveToFirebase();
     },
 
-    // Utility
     calculateMelExpiry
   };
 });
