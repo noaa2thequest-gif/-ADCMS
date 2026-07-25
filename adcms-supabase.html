@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS Pro - Setup Database</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    .card { background: white; border-radius: 10px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    h1 { color: #1e40af; margin-bottom: 10px; font-size: 32px; }
+    .subtitle { color: #666; margin-bottom: 30px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
+    input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+    input:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+    button { padding: 12px 24px; background: #1e40af; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+    button:hover { background: #1e3a8a; }
+    .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+    .alert.success { background: #d4edda; color: #155724; }
+    .alert.error { background: #f8d7da; color: #721c24; }
+    .alert.info { background: #d1ecf1; color: #0c5460; display: block; }
+    .steps { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    .steps ol { margin-left: 20px; line-height: 1.8; }
+    .steps li { margin-bottom: 10px; }
+    .steps a { color: #1e40af; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>✈️ ADCMS Pro</h1>
+      <p class="subtitle">Aircraft Defect & Maintenance Control System - Real-time Database</p>
+      
+      <div id="setupAlert" class="alert info">
+        ℹ️ Setup your Supabase database for real-time multi-user access
+      </div>
+      
+      <div class="steps">
+        <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Quick Setup (3 Steps)</h3>
+        <ol>
+          <li>Go to <a href="https://supabase.com" target="_blank">Supabase.com</a> and create a free account</li>
+          <li>Create a new PostgreSQL project</li>
+          <li>Copy your API credentials below and click Setup</li>
+        </ol>
+      </div>
+      
+      <div class="form-group">
+        <label for="supabaseUrl">Supabase Project URL:</label>
+        <input type="text" id="supabaseUrl" placeholder="https://your-project.supabase.co" />
+      </div>
+      
+      <div class="form-group">
+        <label for="supabaseKey">Supabase Anon Key:</label>
+        <input type="text" id="supabaseKey" placeholder="Your anon public key" />
+      </div>
+      
+      <button onclick="setupDatabase()">✅ Setup Database & Launch App</button>
+      
+      <div id="credentialAlert" class="alert"></div>
+    </div>
+  </div>
+
+  <script>
+    async function setupDatabase() {
+      const url = document.getElementById('supabaseUrl').value;
+      const key = document.getElementById('supabaseKey').value;
+      
+      if (!url || !key) {
+        showAlert('credentialAlert', 'error', '❌ Please enter both URL and Key');
+        return;
+      }
+      
+      localStorage.setItem('supabaseUrl', url);
+      localStorage.setItem('supabaseKey', key);
+      
+      showAlert('credentialAlert', 'success', '✅ Credentials saved! Launching app...');
+      
+      setTimeout(() => {
+        window.location.href = '/index.html';
+      }, 2000);
+    }
+    
+    function showAlert(elementId, type, message) {
+      const alert = document.getElementById(elementId);
+      alert.textContent = message;
+      alert.className = `alert ${type}`;
+      alert.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
