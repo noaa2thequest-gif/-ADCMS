@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ADCMS - Reset</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { color: #2563eb; }
+        p { font-size: 18px; margin: 20px 0; }
+        .success { color: #16a34a; font-weight: bold; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 ADCMS Reset</h1>
+        <p>Clearing all local data...</p>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const status = document.getElementById('status');
+        
+        // Clear all localStorage
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('adcms')) {
+                localStorage.removeItem(key);
+                console.log(`✅ Cleared: ${key}`);
+            }
+        });
+
+        // Clear sessionStorage
+        sessionStorage.clear();
+
+        // Clear IndexedDB
+        if (window.indexedDB) {
+            indexedDB.databases().then(dbs => {
+                dbs.forEach(db => {
+                    indexedDB.deleteDatabase(db.name);
+                });
+            });
+        }
+
+        status.innerHTML = `
+            <p class="success">✅ All local data cleared!</p>
+            <p>Redirecting to dashboard...</p>
+        `;
+
+        setTimeout(() => {
+            window.location.href = '/dashboard.html';
+        }, 2000);
+    </script>
+</body>
+</html>
