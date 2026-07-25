@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS Pro - Real-time Multi-user System</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .app-container { display: flex; min-height: 100vh; }
+    .sidebar { width: 280px; background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white; padding: 20px; overflow-y: auto; position: fixed; height: 100vh; left: 0; top: 0; z-index: 1000; transition: transform 0.3s; }
+    .sidebar.hidden { transform: translateX(-100%); }
+    .menu-toggle { display: none; position: fixed; top: 15px; right: 15px; background: #1e40af; color: white; border: none; padding: 10px 15px; font-size: 24px; cursor: pointer; border-radius: 5px; z-index: 1001; }
+    .sidebar h1 { font-size: 24px; margin-bottom: 5px; }
+    .sidebar p { font-size: 12px; opacity: 0.9; margin-bottom: 30px; }
+    .nav-menu { list-style: none; }
+    .nav-menu li { margin-bottom: 10px; }
+    .nav-menu button { width: 100%; padding: 12px 15px; background: transparent; color: white; border: none; border-radius: 5px; text-align: left; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .nav-menu button:hover { background: rgba(255,255,255,0.1); }
+    .nav-menu button.active { background: rgba(255,255,255,0.2); font-weight: 600; }
+    .main-content { margin-left: 280px; flex: 1; display: flex; flex-direction: column; }
+    .header { background: white; padding: 20px 30px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .header h2 { font-size: 28px; color: #1e40af; }
+    .status { padding: 8px 15px; background: #d4edda; color: #155724; border-radius: 5px; font-size: 12px; font-weight: 600; }
+    .content { flex: 1; padding: 30px; overflow-y: auto; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .aircraft-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+    .aircraft-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); cursor: pointer; transition: all 0.3s; border-top: 5px solid #1e40af; }
+    .aircraft-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.15); transform: translateY(-4px); }
+    .aircraft-card h3 { font-size: 24px; color: #1e40af; margin-bottom: 20px; }
+    .aircraft-card .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    .aircraft-card .stat { background: linear-gradient(135deg, #f0f8ff 0%, #e0f2fe 100%); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #1e40af; }
+    .aircraft-card .stat-label { font-size: 11px; color: #666; margin-bottom: 8px; text-transform: uppercase; font-weight: 600; }
+    .aircraft-card .stat-value { font-size: 28px; font-weight: bold; color: #1e40af; }
+    .form-section { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); max-width: 900px; }
+    .section-title { color: #333; font-size: 16px; font-weight: 600; margin-top: 25px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #1e40af; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; font-size: 14px; }
+    .required::after { content: ' *'; color: red; }
+    input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; font-family: inherit; }
+    input[type="text"]:focus, input[type="date"]:focus, select:focus, textarea:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+    textarea { resize: vertical; min-height: 80px; }
+    .button-group { display: flex; gap: 10px; margin-top: 30px; }
+    button { padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-primary { background: #1e40af; color: white; flex: 1; }
+    .btn-primary:hover { background: #1e3a8a; }
+    .btn-secondary { background: #6c757d; color: white; flex: 1; }
+    .btn-secondary:hover { background: #545b62; }
+    .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; font-weight: 500; }
+    .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; display: block; }
+    .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 15px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f8f9fa; padding: 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #ddd; }
+    td { padding: 15px; border-bottom: 1px solid #ddd; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-open { background: #fff3cd; color: #856404; }
+    .badge-closed { background: #d4edda; color: #155724; }
+    .badge-active { background: #cfe2ff; color: #084298; }
+    .loading { text-align: center; padding: 40px; color: #999; }
+    @media (max-width: 768px) {
+      .menu-toggle { display: block; }
+      .sidebar { width: 100%; height: 100vh; padding: 60px 20px 20px 20px; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .header { flex-direction: column; gap: 15px; align-items: flex-start; }
+      .content { padding: 15px; }
+      .aircraft-grid { grid-template-columns: 1fr; gap: 15px; }
+      .form-section { padding: 20px; max-width: 100%; }
+      .button-group { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-toggle" id="menuToggle">☰</button>
+  <div class="app-container">
+    <aside class="sidebar hidden" id="sidebar">
+      <h1>✈️ ADCMS Pro</h1>
+      <p>Aircraft Defect & Maintenance Control System</p>
+      <ul class="nav-menu">
+        <li><button class="nav-btn active" data-page="dashboard">📊 Dashboard</button></li>
+        <li><button class="nav-btn" data-page="create-defect">➕ Create Defect</button></li>
+        <li><button class="nav-btn" data-page="view-all-defects">🔧 All Defects</button></li>
+        <li><button class="nav-btn" data-page="mel-items">📋 MEL Items</button></li>
+      </ul>
+    </aside>
+    
+    <div class="main-content">
+      <header class="header">
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="status" id="status">🔄 Connecting...</div>
+      </header>
+      
+      <div class="content">
+        <div id="infoAlert" class="alert info">
+          ✅ Connected to Firebase! All data is synced in real-time across all users.
+        </div>
+        
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="page active">
+          <div class="aircraft-grid" id="aircraftGrid">
+            <div class="loading">Loading data from Firebase...</div>
+          </div>
+        </div>
+        
+        <!-- CREATE DEFECT -->
+        <div id="create-defect" class="page">
+          <div class="form-section">
+            <div id="successAlert" class="alert success"></div>
+            <div id="errorAlert" class="alert error"></div>
+            
+            <form id="defectForm">
+              <div class="section-title">Defect Details</div>
+              <div class="form-group">
+                <label for="aircraft" class="required">Aircraft</label>
+                <select id="aircraft" required>
+                  <option value="">-- Select Aircraft --</option>
+                  <option value="1">SU-SKH - Airbus A320</option>
+                  <option value="2">SU-SKI - Airbus A320</option>
+                  <option value="3">SU-SKJ - Airbus A320</option>
+                  <option value="4">SU-SKK - Airbus A320</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="title" class="required">Defect Title</label>
+                <input type="text" id="title" placeholder="e.g., Hydraulic pump noise" required />
+              </div>
+              <div class="form-group">
+                <label for="source" class="required">Defect Source</label>
+                <select id="source" required>
+                  <option>ECAM Message</option>
+                  <option>Failure Message</option>
+                  <option>Captain Entry</option>
+                  <option>Crew Observation</option>
+                  <option selected>Maintenance Observation</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="description" class="required">Description</label>
+                <textarea id="description" placeholder="Describe the defect in detail" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="date" class="required">Report Date</label>
+                <input type="date" id="date" required />
+              </div>
+              <div class="form-group">
+                <label for="requestedBy" class="required">Reported By (Name)</label>
+                <input type="text" id="requestedBy" placeholder="e.g., John Smith" required />
+              </div>
+              
+              <div class="section-title">Spare Part Information</div>
+              <div class="form-group">
+                <label for="sparePart" class="required">Spare Part Name</label>
+                <input type="text" id="sparePart" placeholder="e.g., Hydraulic Pump Assembly" required />
+              </div>
+              <div class="form-group">
+                <label for="sparePartRequiredDate" class="required">Spare Part Required Date</label>
+                <input type="date" id="sparePartRequiredDate" required />
+              </div>
+              <div class="form-group">
+                <label for="sparePartRequestedBy" class="required">Spare Part Requested By</label>
+                <input type="text" id="sparePartRequestedBy" placeholder="e.g., Maintenance Manager" required />
+              </div>
+              <div class="form-group">
+                <label for="sparePartStatus" class="required">Spare Part Status</label>
+                <select id="sparePartStatus" required>
+                  <option value="Ordered">Ordered</option>
+                  <option value="In Transit">In Transit</option>
+                  <option value="Received">Received</option>
+                  <option value="Installed">Installed</option>
+                </select>
+              </div>
+              
+              <div class="section-title">Maintenance Log Entry</div>
+              <div class="form-group">
+                <label for="maintenanceAction" class="required">Action Taken</label>
+                <textarea id="maintenanceAction" placeholder="Describe the maintenance action taken..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="actionTakenBy" class="required">Action Taken By</label>
+                <input type="text" id="actionTakenBy" placeholder="e.g., Technician Name" required />
+              </div>
+              <div class="form-group">
+                <label for="requiredAction" class="required">Next Action</label>
+                <textarea id="requiredAction" placeholder="Describe the next required maintenance action..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="nextActionResponsible" class="required">Next Action Responsible</label>
+                <input type="text" id="nextActionResponsible" placeholder="e.g., Supervisor Name" required />
+              </div>
+              <div class="form-group">
+                <label for="nextActionDeadline" class="required">Next Action Deadline</label>
+                <input type="date" id="nextActionDeadline" required />
+              </div>
+              
+              <div class="section-title">MEL Status</div>
+              <div class="form-group">
+                <label><input type="checkbox" id="isMel" /> <span style="margin-left: 5px;">This is a MEL Item (Minimum Equipment List)</span></label>
+              </div>
+              <div id="melSection" style="display: none;">
+                <div class="form-group">
+                  <label for="melCategory" class="required">MEL Category</label>
+                  <select id="melCategory">
+                    <option value="">-- Select Category --</option>
+                    <option value="A">Category A (Immediate Action)</option>
+                    <option value="B">Category B (3 Days)</option>
+                    <option value="C">Category C (10 Days)</option>
+                    <option value="D">Category D (120 Days)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="melReference">MEL Reference</label>
+                  <input type="text" id="melReference" placeholder="e.g., 34-11-11" />
+                </div>
+              </div>
+              
+              <div class="button-group">
+                <button type="submit" class="btn-primary">✅ Create Defect</button>
+                <button type="reset" class="btn-secondary">Clear Form</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <!-- ALL DEFECTS -->
+        <div id="view-all-defects" class="page">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Aircraft</th>
+                  <th>Title</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>MEL</th>
+                </tr>
+              </thead>
+              <tbody id="allDefectsTable">
+                <tr><td colspan="6" style="text-align: center; color: #999;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- MEL ITEMS -->
+        <div id="mel-items" class="page">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Aircraft</th>
+                  <th>Category</th>
+                  <th>Reference</th>
+                  <th>Expiry Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="melItemsTable">
+                <tr><td colspan="6" style="text-align: center; color: #999;">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration (Public Demo Config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAzZ8K_-_-_-_-_-_-_-_-_-_-_-_-_-_",
+      authDomain: "adcms-pro.firebaseapp.com",
+      databaseURL: "https://adcms-pro-default-rtdb.firebaseio.com",
+      projectId: "adcms-pro",
+      storageBucket: "adcms-pro.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef123456"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const aircraftMap = { 1: 'SU-SKH', 2: 'SU-SKI', 3: 'SU-SKJ', 4: 'SU-SKK' };
+    let allDefects = {};
+    let allMels = {};
+
+    // UI Setup
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    menuToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+      menuToggle.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+    });
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const page = this.dataset.page;
+        showPage(page);
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open');
+          menuToggle.textContent = '☰';
+        }
+      });
+    });
+    
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageName).classList.add('active');
+      const titles = {
+        'dashboard': '✈️ Aircraft Dashboard',
+        'create-defect': '➕ Create Defect',
+        'view-all-defects': '🔧 All Defects',
+        'mel-items': '📋 MEL Items'
+      };
+      document.getElementById('pageTitle').textContent = titles[pageName] || 'Dashboard';
+      if (pageName === 'dashboard') updateDashboard();
+      if (pageName === 'view-all-defects') updateAllDefectsTable();
+      if (pageName === 'mel-items') updateMelItemsTable();
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+      document.getElementById('sparePartRequiredDate').value = today;
+      document.getElementById('nextActionDeadline').value = today;
+      
+      document.getElementById('isMel').addEventListener('change', function() {
+        document.getElementById('melSection').style.display = this.checked ? 'block' : 'none';
+      });
+      
+      document.getElementById('defectForm').addEventListener('submit', handleSubmit);
+      
+      // Load data from Firebase
+      loadDataFromFirebase();
+      updateStatus('✅ Connected');
+    });
+    
+    function loadDataFromFirebase() {
+      db.ref('defects').on('value', (snapshot) => {
+        allDefects = snapshot.val() || {};
+        updateDashboard();
+        updateAllDefectsTable();
+      });
+      
+      db.ref('mels').on('value', (snapshot) => {
+        allMels = snapshot.val() || {};
+        updateDashboard();
+        updateMelItemsTable();
+      });
+    }
+    
+    function updateStatus(msg) {
+      document.getElementById('status').textContent = msg;
+    }
+    
+    function showAlert(type, message) {
+      const successAlert = document.getElementById('successAlert');
+      const errorAlert = document.getElementById('errorAlert');
+      if (type === 'success') {
+        successAlert.textContent = message;
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
+        setTimeout(() => { successAlert.style.display = 'none'; }, 5000);
+      } else {
+        errorAlert.textContent = message;
+        errorAlert.style.display = 'block';
+        successAlert.style.display = 'none';
+        setTimeout(() => { errorAlert.style.display = 'none'; }, 5000);
+      }
+    }
+    
+    function handleSubmit(e) {
+      e.preventDefault();
+      try {
+        const aircraftId = document.getElementById('aircraft').value;
+        const title = document.getElementById('title').value;
+        const source = document.getElementById('source').value;
+        const description = document.getElementById('description').value;
+        const date = document.getElementById('date').value;
+        const requestedBy = document.getElementById('requestedBy').value;
+        const sparePart = document.getElementById('sparePart').value;
+        const sparePartRequiredDate = document.getElementById('sparePartRequiredDate').value;
+        const sparePartRequestedBy = document.getElementById('sparePartRequestedBy').value;
+        const sparePartStatus = document.getElementById('sparePartStatus').value;
+        const maintenanceAction = document.getElementById('maintenanceAction').value;
+        const actionTakenBy = document.getElementById('actionTakenBy').value;
+        const requiredAction = document.getElementById('requiredAction').value;
+        const nextActionResponsible = document.getElementById('nextActionResponsible').value;
+        const nextActionDeadline = document.getElementById('nextActionDeadline').value;
+        const isMel = document.getElementById('isMel').checked;
+        const melCategory = document.getElementById('melCategory').value;
+        const melReference = document.getElementById('melReference').value;
+        
+        if (!aircraftId) throw new Error('❌ Please select an aircraft');
+        
+        const defectId = Date.now().toString();
+        const newDefect = {
+          id: defectId,
+          aircraftId: parseInt(aircraftId),
+          title, source, description, date, requestedBy,
+          sparePart, sparePartRequiredDate, sparePartRequestedBy, sparePartStatus,
+          maintenanceAction, actionTakenBy, requiredAction, nextActionResponsible, nextActionDeadline,
+          isMel, melCategory, melReference,
+          status: 'Open',
+          createdAt: new Date().toISOString()
+        };
+        
+        db.ref('defects/' + defectId).set(newDefect);
+        
+        if (isMel && melCategory) {
+          const days = { 'A': 0, 'B': 3, 'C': 10, 'D': 120 }[melCategory] || 0;
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + days);
+          
+          const melId = Date.now().toString() + 'mel';
+          const newMel = {
+            id: melId,
+            aircraftId: parseInt(aircraftId),
+            defectId: defectId,
+            category: melCategory,
+            reference: melReference,
+            status: 'Active',
+            expiry: expiry.toISOString().split('T')[0],
+            createdAt: new Date().toISOString()
+          };
+          
+          db.ref('mels/' + melId).set(newMel);
+        }
+        
+        showAlert('success', '✅ Defect created and synced to all users!');
+        document.getElementById('defectForm').reset();
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('sparePartRequiredDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('nextActionDeadline').value = new Date().toISOString().split('T')[0];
+        document.getElementById('isMel').checked = false;
+        document.getElementById('melSection').style.display = 'none';
+      } catch (error) {
+        showAlert('error', error.message || 'An error occurred');
+      }
+    }
+    
+    function updateDashboard() {
+      const aircraftGrid = document.getElementById('aircraftGrid');
+      
+      const aircraftCards = Object.entries(aircraftMap).map(([id, name]) => {
+        const aircraftDefects = Object.values(allDefects).filter(d => d.aircraftId === parseInt(id));
+        const aircraftMels = Object.values(allMels).filter(m => m.aircraftId === parseInt(id));
+        const openDefects = aircraftDefects.filter(d => d.status === 'Open').length;
+        const activeMels = aircraftMels.filter(m => m.status === 'Active').length;
+        const lastDefect = aircraftDefects.length > 0 ? aircraftDefects[aircraftDefects.length - 1] : null;
+        
+        return `
+          <div class="aircraft-card">
+            <h3>✈️ ${name}</h3>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Total Defects</div>
+                <div class="stat-value">${aircraftDefects.length}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Open</div>
+                <div class="stat-value" style="color: ${openDefects > 0 ? '#dc2626' : '#16a34a'}">${openDefects}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">MEL Items</div>
+                <div class="stat-value">${aircraftMels.length}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Active MELs</div>
+                <div class="stat-value" style="color: #f59e0b">${activeMels}</div>
+              </div>
+            </div>
+            ${lastDefect ? `
+              <div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 12px; border-left: 3px solid #f59e0b;">
+                <div style="color: #333; font-weight: 600; margin-bottom: 4px;">⚠️ Last: ${lastDefect.title}</div>
+                <div style="color: #666; font-size: 11px;">📅 ${lastDefect.date} | Status: ${lastDefect.status}</div>
+              </div>
+            ` : '<div style="background: #dcfce7; padding: 12px; border-radius: 6px; color: #166534; text-align: center; font-size: 12px; font-weight: 600; border-left: 3px solid #16a34a;">✓ No defects</div>'}
+          </div>
+        `;
+      }).join('');
+      
+      aircraftGrid.innerHTML = aircraftCards;
+    }
+    
+    function updateAllDefectsTable() {
+      const table = document.getElementById('allDefectsTable');
+      const defects = Object.values(allDefects);
+      
+      if (defects.length === 0) {
+        table.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No defects</td></tr>';
+      } else {
+        table.innerHTML = defects.map(d => {
+          const hasMel = Object.values(allMels).some(m => m.defectId === d.id);
+          return `
+            <tr>
+              <td>#${d.id.substring(0, 8)}</td>
+              <td>${aircraftMap[d.aircraftId] || 'N/A'}</td>
+              <td>${d.title}</td>
+              <td>${d.date}</td>
+              <td><span class="badge badge-${d.status.toLowerCase()}">${d.status}</span></td>
+              <td>${hasMel ? '<span class="badge badge-active">✓ Yes</span>' : '<span style="color: #999;">-</span>'}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+    
+    function updateMelItemsTable() {
+      const table = document.getElementById('melItemsTable');
+      const mels = Object.values(allMels);
+      
+      if (mels.length === 0) {
+        table.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No MEL items</td></tr>';
+      } else {
+        table.innerHTML = mels.map(m => `
+          <tr>
+            <td>#${m.id.substring(0, 8)}</td>
+            <td>${aircraftMap[m.aircraftId] || 'N/A'}</td>
+            <td>Category ${m.category}</td>
+            <td>${m.reference}</td>
+            <td>${m.expiry}</td>
+            <td><span class="badge badge-${m.status.toLowerCase()}">${m.status}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+  </script>
+</body>
+</html>
