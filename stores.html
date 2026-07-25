@@ -7,20 +7,21 @@
   <link rel="stylesheet" href="style.css" />
   <style>
     .stores-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .btn-add { background: #5f2bbd; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .search-box { width: 100%; padding: 12px; margin-bottom: 20px; background: #1e1e3f; border: 1px solid #333; color: white; border-radius: 8px; }
-    .stores-table { width: 100%; border-collapse: collapse; background: #1e1e3f; border-radius: 8px; overflow: hidden; }
-    .stores-table th, .stores-table td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
-    .stores-table th { background: #29135e; font-size: 12px; text-transform: uppercase; }
+    .btn-add { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    .btn-add:hover { background: var(--accent-purple); transform: translateY(-1px); }
+    .search-box { width: 100%; padding: 12px; margin-bottom: 20px; background: white; border: 1px solid var(--line); color: var(--text); border-radius: 8px; }
+    .stores-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stores-table th, .stores-table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--line); color: var(--text); }
+    .stores-table th { background: #f8fafc; font-size: 12px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
     .qty-badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; }
     .qty-low { background: #ff5252; color: white; }
     .qty-ok { background: #4caf50; color: white; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
     .modal.active { display: flex; }
-    .modal-content { background: #171036; padding: 30px; border-radius: 12px; width: 400px; border: 1px solid #5f2bbd; }
+    .modal-content { background: white; padding: 30px; border-radius: 12px; width: 400px; border: 1px solid var(--line); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #aaa; }
-    .form-group input, .form-group select { width: 100%; padding: 10px; background: #0b061a; border: 1px solid #333; color: white; border-radius: 4px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--muted); font-weight: 600; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; background: white; border: 1px solid var(--line); color: var(--text); border-radius: 6px; }
     .btn-save { background: #4caf50; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
     .btn-cancel { background: #444; color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px; }
     .btn-delete { background: #ff5252; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; }

@@ -105,12 +105,12 @@
           </div>
         </div>
       </div>
-        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
-      </div>
-      <nav>
-        <a class="active" href="index.html">⌂ <span>Fleet Overview</span></a>
-        <a href="mel.html">▤ <span>MEL Management</span></a>
-        <a href="admin.html">⚙ <span>Administration</span></a>
+        <div style="padding: 0 10px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 16px;">
+          <h1 style="font-size: 18px; margin: 0;">ADCMS</h1>
+          <p style="font-size: 10px; opacity: 0.7; margin: 5px 0 0;">Aircraft Defect & Maintenance Control</p>
+        </div>
+      <nav id="mainNav">
+        <!-- Populated by ADCMSUI.renderNav() -->
       </nav>
       <div class="sidebar-footer">
         <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
@@ -166,9 +166,10 @@
 
         <div class="section-card">
           <div class="section-head">
-            <h3>Full Defect History</h3>
+            <h3>All Defects for This Aircraft</h3>
+            <span id="allDefectsCount" class="workflow-badge">0</span>
           </div>
-          <div id="fullHistoryList">
+          <div id="allDefectsList" style="display: grid; gap: 15px;">
             <!-- Populated by JS -->
           </div>
         </div>

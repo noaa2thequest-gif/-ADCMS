@@ -5,6 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ADCMS — Defect Control</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    @keyframes slideInUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOutDown {
+      from {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -22,6 +44,8 @@
         <a href="index.html">⌂ <span>Fleet Overview</span></a>
         <a href="dashboard.html">◫ <span>Dashboard</span></a>
         <a class="active" href="defect-control.html">▱ <span>Defect Control</span></a>
+        <a href="mel.html">▤ <span>MEL Management</span></a>
+        <a href="cabin-defects.html">🪟 <span>Cabin Defects</span></a>
         <a href="stores.html">📦 <span>Stores & Inventory</span></a>
         <a href="mcc-center.html">🎛️ <span>MCC Center</span></a>
       </nav>
@@ -37,9 +61,149 @@
         <div class="section-head">
           <h2>▱ Defect Control Panel</h2>
           <span id="defectCountBadge" class="workflow-badge">0 open</span>
+          <button onclick="ADCMSWorkflow.openNewDefectModal()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">+ New Defect</button>
+                </div>
+        <!-- Material Request Modal -->
+        <div id="materialRequestModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+          <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 500px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #1e293b; border-bottom: 2px solid #8b5cf6; padding-bottom: 12px;">📦 Material Request</h3>
+            
+            <div class="form-group" style="margin-bottom: 15px; margin-top: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">Material Description *</label>
+              <textarea id="materialRequestDescription" rows="4" placeholder="Describe the material needed (e.g., Replacement bulb, Engine oil, etc.)..." style="width: 100%; padding: 12px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">Quantity *</label>
+              <input type="text" id="materialRequestQuantity" placeholder="e.g., 2 units, 5 liters, 1 box" style="width: 100%; padding: 12px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">Part Number</label>
+              <input type="text" id="materialRequestPartNumber" placeholder="e.g., PN-12345, ABC-789" style="width: 100%; padding: 12px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+              <button onclick="ADCMSWorkflow.submitMaterialRequest()" style="flex: 1; background: #8b5cf6; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Submit Request</button>
+              <button onclick="ADCMSWorkflow.closeMaterialRequestModal()" style="flex: 1; background: #e2e8f0; color: #1e293b; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <!-- New Defect Modal -->
+        <div id="newDefectModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+          <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 600px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin-top: 0; color: #1e293b;">Create New Defect Entry</h3>
+            
+            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+              <div class="form-group">
+                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Aircraft</label>
+                <select id="newDefectAircraft" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;"></select>
+              </div>
+              <div class="form-group">
+                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Defect Source</label>
+                <select id="newDefectSource" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                  <option value="">Select Source</option>
+                  <option value="ECAM Msg">ECAM Msg</option>
+                  <option value="Failure Msg">Failure Msg</option>
+                  <option value="Capt Entry">Capt Entry</option>
+                  <option value="Crew Observation">Crew Observation</option>
+                  <option value="Maintenance Observation">Maintenance Observation</option>
+                  <option value="Cabin">Cabin</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Issue / Description</label>
+              <input type="text" id="newDefectIssue" placeholder="Brief description of the defect" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Is this a MEL item?</label>
+              <select id="newDefectIsMEL" onchange="ADCMSWorkflow.toggleMELFields()" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </div>
+
+            <!-- MEL Fields -->
+            <div id="melFieldsContainer" style="display: none; background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e2e8f0;">
+              <h4 style="margin-top: 0; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">MEL / Deferral Details</h4>
+              <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                  <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Category</label>
+                  <select id="newDefectMELCategory" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                    <option value="A">Cat A</option>
+                    <option value="B">Cat B</option>
+                    <option value="C" selected>Cat C</option>
+                    <option value="D">Cat D</option>
+                    <option value="Connection 1">Connection 1</option>
+                    <option value="Connection 2">Connection 2</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Placard Required</label>
+                  <select id="newDefectPlacardRequired" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                <div class="form-group">
+                  <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Reference (MEL/CDL/AMM)</label>
+                  <input type="text" id="newDefectMELReference" placeholder="e.g., MEL-25-11-01" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                </div>
+                <div class="form-group">
+                  <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #64748b; font-weight: 600;">Open Date</label>
+                  <input type="date" id="newDefectOpenDate" style="width: 100%; padding: 10px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Maintenance Log -->
+            <div style="background: #fffbeb; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fef3c7;">
+              <h4 style="margin-top: 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 8px; margin-bottom: 12px;">Maintenance Log Entry</h4>
+              <div class="form-group" style="margin-bottom: 10px;">
+                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #92400e; font-weight: 600;">Action Taken (What was done?)</label>
+                <textarea id="newDefectMaintenanceActionLog" rows="3" placeholder="Describe the maintenance action performed..." style="width: 100%; padding: 10px; background: white; border: 1px solid #fde68a; color: #1e293b; border-radius: 6px; font-family: inherit;"></textarea>
+              </div>
+              <div class="form-group">
+                <label style="display: block; margin-bottom: 5px; font-size: 13px; color: #92400e; font-weight: 600;">Next Action (Proposed Step)</label>
+                <input type="text" id="newDefectNextAction" placeholder="e.g., Monitor for 24h, Check on next transit" style="width: 100%; padding: 10px; background: white; border: 1px solid #fde68a; color: #1e293b; border-radius: 6px;">
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button onclick="ADCMSWorkflow.submitNewDefect()" style="flex: 1; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Create Defect & Log Action</button>
+              <button onclick="ADCMSWorkflow.closeNewDefectModal()" style="flex: 1; background: #e2e8f0; color: #1e293b; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Modal (Professional Replacement for prompt()) -->
+        <div id="actionModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+          <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 500px; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #1e293b; border-bottom: 2px solid #2563eb; padding-bottom: 12px;">Add Maintenance Action</h3>
+            
+            <div class="form-group" style="margin-bottom: 15px; margin-top: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">Action Taken (What was done?)</label>
+              <textarea id="actionModalAction" rows="4" placeholder="Describe the maintenance action performed..." style="width: 100%; padding: 12px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px; font-family: inherit; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-size: 13px; color: #64748b; font-weight: 600;">Next Action / Proposed Step</label>
+              <input type="text" id="actionModalNextAction" placeholder="e.g., Monitor for 24h, Schedule follow-up inspection" style="width: 100%; padding: 12px; background: white; border: 1px solid #e2e8f0; color: #1e293b; border-radius: 6px;">
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+              <button onclick="ADCMSWorkflow.submitActionModal()" style="flex: 1; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Save Action</button>
+              <button onclick="ADCMSWorkflow.closeActionModal()" style="flex: 1; background: #e2e8f0; color: #1e293b; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancel</button>
+            </div>
+          </div>
         </div>
         
-        <div id="defectControlList" class="defect-list" style="margin-top: 20px;">
+        <div id="defectControlList" style="margin-top: 20px; display: grid; gap: 20px;">
           <p style="text-align: center; padding: 40px; color: #888;">Loading defects...</p>
         </div>
       </section>

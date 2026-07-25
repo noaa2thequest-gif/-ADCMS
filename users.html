@@ -111,9 +111,9 @@
   <script src="modules/auth.js"></script>
   <script src="modules/ui.js"></script>
   <script>
-    function renderUsers() {
+    async function renderUsers() {
       const list = document.getElementById('usersList');
-      const users = ADCMSAuth.getUsers();
+      const users = await ADCMSAuth.getUsers();
 
       list.innerHTML = users.map(user => `
         <tr>
@@ -136,34 +136,38 @@
           </td>
           <td>
             ${!user.approved ? `<button class="btn-approve" onclick="approveUser('${user.email}')">Approve</button>` : ''}
-            <button class="btn-save" onclick="alert('Changes saved for ${user.name}')">Save</button>
+            <button class="btn-save" onclick="saveUserChanges('${user.email}')">Save</button>
           </td>
         </tr>
       `).join('');
     }
 
-    function updateRole(email, newRole) {
-      const users = ADCMSAuth.getUsers();
+    async function updateRole(email, newRole) {
+      const users = await ADCMSAuth.getUsers();
       const user = users.find(u => u.email === email);
       if (user) {
         user.role = newRole;
-        ADCMSAuth.saveUsers(users);
+        await ADCMSAuth.saveUsers(users);
       }
     }
 
-    function approveUser(email) {
-      const users = ADCMSAuth.getUsers();
+    async function approveUser(email) {
+      const users = await ADCMSAuth.getUsers();
       const user = users.find(u => u.email === email);
       if (user) {
         user.approved = true;
-        ADCMSAuth.saveUsers(users);
+        await ADCMSAuth.saveUsers(users);
         renderUsers();
       }
     }
 
-    window.onload = () => {
+    async function saveUserChanges(email) {
+      alert('Changes saved for user!');
+    }
+
+    window.onload = async () => {
       ADCMSAuth.checkAccess();
-      renderUsers();
+      await renderUsers();
     };
   </script>
 </body>

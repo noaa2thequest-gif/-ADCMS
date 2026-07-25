@@ -28,15 +28,10 @@
         <a href="aircraft.html">✈ <span>Aircraft</span></a>
         <a href="defect-control.html">▱ <span>Defect Control</span></a>
         <a href="mel.html">▤ <span>MEL Management</span></a>
-        <a href="cabin-defects.html">▣ <span>Cabin Defects</span></a>
-        <a href="mcc.html">▥ <span>MCC Center</span></a>
-        <a href="surveillance.html">◉ <span>Surveillance & SAFA</span></a>
-        <a href="stores.html">▦ <span>Stores & Inventory</span></a>
-        <a href="reports.html">◩ <span>Reports</span></a>
-        <a href="notifications.html">♧ <span>Notifications</span><b>8</b></a>
+        <a href="cabin-defects.html">🪟 <span>Cabin Defects</span></a>
+        <a href="stores.html">📦 <span>Stores & Inventory</span></a>
+        <a href="mcc-center.html">🎛️ <span>MCC Center</span></a>
         <a href="admin.html">⚙ <span>Administration</span></a>
-        <a href="users.html">👤 <span>User Management</span></a>
-        <a href="audit.html">▧ <span>Audit Log</span></a>
       </nav>
 
       <div class="sidebar-footer">
@@ -68,7 +63,7 @@
             <p>Real-time overview of fleet status and maintenance</p>
           </div>
           <div class="title-actions">
-            <a id="newDefectBtn" class="new-defect-btn" href="new-defect.html">+ New Defect</a>
+            <button id="newDefectBtn" class="new-defect-btn" onclick="ADCMSWorkflow.openNewDefectModal()">+ New Defect</button>
             <input id="search" placeholder="Search aircraft, tail number, or defect..." />
           </div>
         </div>
@@ -200,6 +195,7 @@
   <script src="modules/data.js"></script>
   <script src="modules/auth.js"></script>
   <script src="modules/ui.js"></script>
+  <script src="modules/workflow.js"></script>
   <script src="modules/dashboard.js"></script>
   <script src="app.js"></script>
 </body>

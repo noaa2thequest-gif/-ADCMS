@@ -14,10 +14,39 @@
     }
 
     .mel-table thead {
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      font-weight: 600;
+      background-color: #f8fafc;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
     }
+    .mel-table th {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+    .mel-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+    }
+    .mel-table tbody tr:hover {
+      background-color: var(--bg);
+    }
+    .btn-add { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    .btn-add:hover { background: var(--accent-purple); transform: translateY(-1px); }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 30px; border-radius: 12px; width: 500px; border: 1px solid var(--line); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--muted); font-weight: 600; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: white; border: 1px solid var(--line); color: var(--text); border-radius: 6px; font-family: inherit; }
+    .btn-save { background: var(--purple); color: white; border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: all 0.2s; }
+    .btn-save:hover { background: var(--accent-purple); transform: translateY(-1px); }
+    .btn-cancel { background: #ccc; color: var(--text); border: none; padding: 10px; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+    .btn-cancel:hover { background: #bbb; transform: translateY(-1px); }
+    .btn-edit { background: var(--info); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px; }
+    .btn-delete { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
     .mel-table th {
       padding: 12px;
@@ -244,6 +273,37 @@
       <section class="content">
         <div class="title-row">
           <div><h2>MEL Management</h2><p>Monitor and manage Minimum Equipment List (MEL) items across the fleet</p></div>
+          <button class="btn-add" onclick="ADCMSMEL.openAddMelModal()">+ Add New MEL</button>
+        </div>
+
+        <!-- Add/Edit MEL Modal -->
+        <div id="melModal" class="modal">
+          <div class="modal-content">
+            <h3>Add/Edit MEL Item</h3>
+            <input type="hidden" id="melId">
+            <div class="form-group"><label>Aircraft</label><select id="melAircraft"></select></div>
+            <div class="form-group"><label>Issue</label><input type="text" id="melIssue"></div>
+            <div class="form-group"><label>MEL Category</label><select id="melCategory">
+              <option value="A">Category A</option>
+              <option value="B">Category B</option>
+              <option value="C">Category C</option>
+              <option value="D">Category D</option>
+            </select></div>
+            <div class="form-group"><label>Reference (MEL/CDL/AMM/TSM/Non-Airworthiness)</label><input type="text" id="melReference" placeholder="e.g., MEL-25-11-01"></div>
+            <div class="form-group"><label>Open Date</label><input type="date" id="melOpenDate"></div>
+            <div class="form-group"><label>Placard Required</label><select id="melPlacardRequired">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select></div>
+            <div class="form-group"><label>Maintenance Action</label><textarea id="melMaintenanceAction" rows="3"></textarea></div>
+            <div class="form-group"><label>Close Date</label><input type="date" id="melCloseDate"></div>
+            <div class="form-group"><label>Status</label><select id="melStatus">
+              <option value="open">Open</option>
+              <option value="closed">Closed</option>
+            </select></div>
+            <button class="btn-save" onclick="ADCMSMEL.submitMel()">Save MEL</button>
+            <button class="btn-cancel" onclick="ADCMSMEL.closeMelModal()">Cancel</button>
+          </div>
         </div>
 
         <!-- MEL Statistics -->

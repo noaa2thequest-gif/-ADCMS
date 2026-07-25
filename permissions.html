@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADCMS — Permission Management</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo-container">
+          <img src="assets/img/logo.png" alt="Sky Vision Airlines" class="company-logo">
+          <div class="brand-credits">
+            <span class="designer">Designed by: Eng. Hany Omar</span>
+            <span class="reviewer">Reviewed by: Eng. Akram El-Gendy</span>
+          </div>
+        </div>
+      </div>
+        <div>
+          <h1>ADCMS</h1>
+          <p>Aircraft Defect &<br>Maintenance Control System</p>
+        </div>
+      </div>
+
+      <nav id="mainNav">
+        <!-- Navigation will be populated by ui.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
+        <small id="appVersion">Version 1.0 (Prototype)<br>© 2025 ADCMS</small>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main>
+      <header>
+        <button class="menu" id="menuBtn" style="display: block !important;">☰</button>
+        <div class="profile">
+          <span class="bell">♧<b id="notificationCount">0</b></span>
+          <div class="avatar" id="userAvatar">?</div>
+          <div>
+            <strong id="userName">User</strong>
+            <small id="userRole">Role</small>
+          </div>
+        </div>
+      </header>
+
+      <section class="content">
+        <!-- ========== TITLE ROW ========== -->
+        <div class="title-row">
+          <div>
+            <h2>Permission Management</h2>
+            <p>Manage user permissions and access control</p>
+          </div>
+          <div class="title-actions">
+            <button id="grantPermissionBtn" class="new-defect-btn">+ Grant Permission</button>
+          </div>
+        </div>
+
+        <!-- ========== TABS ========== -->
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="users">Users & Permissions</button>
+          <button class="tab-btn" data-tab="audit">Audit Log</button>
+        </div>
+
+        <!-- ========== USERS & PERMISSIONS TAB ========== -->
+        <div id="users-tab" class="tab-content active">
+          <div class="search-bar">
+            <input type="text" id="userSearch" placeholder="Search users..." class="workflow-input" />
+          </div>
+
+          <div id="usersList" class="users-grid">
+            <!-- Users will be populated here -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="usersEmpty" class="empty-state" hidden>
+            <p>No users found</p>
+          </div>
+        </div>
+
+        <!-- ========== AUDIT LOG TAB ========== -->
+        <div id="audit-tab" class="tab-content">
+          <div class="search-bar">
+            <input type="text" id="auditSearch" placeholder="Search audit logs..." class="workflow-input" />
+          </div>
+
+          <div id="auditList" class="audit-list">
+            <!-- Audit logs will be populated here -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="auditEmpty" class="empty-state" hidden>
+            <p>No audit logs found</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========== GRANT PERMISSION MODAL ========== -->
+    <div id="grantPermissionModal" class="modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Grant Permission</h3>
+          <button class="close-btn" id="closeGrantModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <label>User</label>
+          <select id="permissionUserSelect" class="workflow-input">
+            <option value="">Select a user...</option>
+          </select>
+
+          <label>Permission</label>
+          <select id="permissionSelect" class="workflow-input">
+            <option value="">Select a permission...</option>
+          </select>
+
+          <div id="permissionDescription" class="info-box" hidden>
+            <!-- Permission description will appear here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelGrantBtn" class="cancel-btn">Cancel</button>
+          <button id="confirmGrantBtn" class="confirm-btn">Grant Permission</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== REVOKE PERMISSION MODAL ========== -->
+    <div id="revokePermissionModal" class="modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Revoke Permission</h3>
+          <button class="close-btn" id="closeRevokeModal">✕</button>
+        </div>
+        <div class="modal-body">
+          <p id="revokeConfirmText">Are you sure you want to revoke this permission?</p>
+          <p class="warning-text">This action will be logged in the audit trail.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="cancelRevokeBtn" class="cancel-btn">Cancel</button>
+          <button id="confirmRevokeBtn" class="confirm-btn danger">Revoke Permission</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TOAST NOTIFICATION ========== -->
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="modules/ui.js"></script>
+  <script src="modules/api-client.js"></script>
+  <script src="permissions-trpc.js"></script>
+</body>
+</html>

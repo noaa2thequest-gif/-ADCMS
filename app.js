@@ -83,7 +83,7 @@ if (typeof window !== 'undefined') {
       }
 
       // MCC Center
-      if (ADCMSMCCCenter && (document.getElementById('mccMelList') || window.location.pathname.includes('mcc-center.html'))) {
+      if (ADCMSMCCCenter && (document.getElementById('mccDefectList') || window.location.pathname.includes('mcc-center.html'))) {
         await ADCMSMCCCenter.init();
       }
 

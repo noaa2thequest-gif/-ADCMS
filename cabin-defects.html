@@ -5,274 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ADCMS — Cabin Defects</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .cabin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-      gap: 20px;
-    }
-
-    .cabin-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .cabin-actions button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      background-color: var(--accent);
-      color: white;
-      transition: all 0.3s;
-    }
-
-    .cabin-actions button:hover {
-      opacity: 0.8;
-    }
-
-    .cabin-filter {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      padding: 8px 16px;
-      border: 2px solid var(--border-color);
-      background-color: var(--bg-secondary);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .filter-btn.active {
-      background-color: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-
-    .cabin-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .cabin-defect-card {
-      background-color: var(--bg-secondary);
-      border-radius: 10px;
-      overflow: hidden;
-      border-left: 5px solid var(--accent);
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-
-    .cabin-defect-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    }
-
-    .cabin-card-header {
-      padding: 15px;
-      background-color: var(--bg-primary);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .cabin-card-header h4 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .cabin-card-header small {
-      color: var(--text-dim);
-      font-size: 11px;
-    }
-
-    .cabin-status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge-open { background: #e3f2fd; color: #1565c0; }
-    .badge-closed { background: #e8f5e9; color: #2e7d32; }
-    .badge-pending { background: #fff3e0; color: #e65100; }
-
-    .cabin-card-body {
-      padding: 15px;
-    }
-
-    .cabin-card-body p {
-      margin: 8px 0;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-    .cabin-card-body strong {
-      color: var(--text-primary);
-    }
-
-    .cabin-card-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 12px 0;
-      font-size: 11px;
-    }
-
-    .meta-item {
-      background-color: var(--bg-primary);
-      padding: 8px;
-      border-radius: 4px;
-    }
-
-    .meta-item label {
-      color: var(--text-dim);
-      display: block;
-      font-size: 10px;
-      text-transform: uppercase;
-    }
-
-    .meta-item span {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .cabin-card-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .cabin-card-actions button {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-view {
-      background-color: var(--accent);
-      color: white;
-    }
-
-    .btn-close {
-      background-color: #4caf50;
-      color: white;
-    }
-
-    .btn-delete {
-      background-color: #ff5252;
-      color: white;
-    }
-
-    .btn-view:hover { opacity: 0.8; }
-    .btn-close:hover { opacity: 0.8; }
-    .btn-delete:hover { opacity: 0.8; }
-
-    .add-cabin-defect-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .add-cabin-defect-modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background-color: var(--bg-secondary);
-      padding: 30px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-content h3 {
-      margin: 0 0 20px 0;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 6px;
-      font-size: 13px;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-size: 13px;
-    }
-
-    .form-group textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .modal-actions button {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-submit {
-      background-color: var(--accent);
-      color: white;
-    }
-
-    .btn-cancel {
-      background-color: var(--border-color);
-      color: var(--text-primary);
-    }
-  </style>
 </head>
 <body>
   <div class="app">
@@ -286,99 +18,120 @@
           </div>
         </div>
       </div>
-        <div><h1>ADCMS</h1><p>Aircraft Defect &<br>Maintenance Control System</p></div>
-      </div>
-      <nav>
-        <a href="index.html">⌂ <span>Fleet Overview</span></a>
-        <a class="active" href="cabin-defects.html">🪟 <span>Cabin Defects</span></a>
-        <a href="mel.html">▤ <span>MEL Management</span></a>
-        <a href="surveillance.html">◉ <span>Surveillance & SAFA</span></a>
+      <nav id="mainNav">
+        <!-- Populated by ADCMSUI.renderNav() -->
       </nav>
-      <div class="sidebar-footer">
-        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
-        <small id="appVersion">Version 1.3 (Build 13)<br>© 2026 ADCMS</small>
-      </div>
     </aside>
 
     <main>
       <header>
         <button class="menu" id="menuBtn" style="display: block !important;">☰</button>
-        <div class="profile"><span class="bell">♧<b>8</b></span><div class="avatar">H</div><div><strong>Hany Omar</strong><small>Super Admin</small></div></div>
+        <div class="profile"><div class="avatar">C</div><div><strong>Cabin Dept</strong><small>Maintenance</small></div></div>
       </header>
 
       <section class="content">
-        <div class="cabin-header">
+        <div class="section-head">
           <div>
-            <h2>Cabin Defects Management</h2>
-            <p style="color: var(--text-dim); margin: 5px 0 0 0;">Track and manage all cabin-related issues</p>
+            <h2>🪟 Cabin Maintenance & Defects</h2>
+            <p style="color: #64748b; margin: 5px 0 0 0; font-size: 14px;">Managed routing from Cockpit/Crew entries</p>
           </div>
-          <div class="cabin-actions">
-            <button onclick="ADCMSCabinDefects.openAddModal()">+ Add Cabin Defect</button>
-          </div>
+          <span id="cabinDefectCount" class="workflow-badge">0 items</span>
+          <button onclick="ADCMSCabin.openAddModal()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">+ Log Cabin Issue</button>
         </div>
 
-        <!-- Filter Buttons -->
-        <div class="cabin-filter">
-          <button class="filter-btn active" onclick="ADCMSCabinDefects.filterByStatus('all')">All</button>
-          <button class="filter-btn" onclick="ADCMSCabinDefects.filterByStatus('Open')">Open</button>
-          <button class="filter-btn" onclick="ADCMSCabinDefects.filterByStatus('Closed')">Closed</button>
-          <button class="filter-btn" onclick="ADCMSCabinDefects.filterByStatus('Pending')">Pending</button>
-        </div>
-
-        <!-- Cabin Defects Cards Grid -->
-        <div id="cabinDefectsGrid" class="cabin-cards-grid">
-          <!-- Populated by JS -->
-        </div>
-
-        <!-- Add Cabin Defect Modal -->
-        <div id="addCabinDefectModal" class="add-cabin-defect-modal">
-          <div class="modal-content">
-            <h3>Add New Cabin Defect</h3>
-            
-            <div class="form-group">
-              <label>Aircraft Registration</label>
-              <select id="cabinAircraft" class="workflow-input">
-                <option value="">-- Select Aircraft --</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Cabin Area</label>
-              <input id="cabinArea" type="text" placeholder="e.g., Seat 12A, Lavatory 1, Galley" />
-            </div>
-
-            <div class="form-group">
-              <label>Issue Description</label>
-              <textarea id="cabinIssue" placeholder="Describe the cabin defect..."></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>Priority</label>
-              <select id="cabinPriority">
-                <option value="Low">Low</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="High">High</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Reported By</label>
-              <input id="cabinReportedBy" type="text" placeholder="Name or ID" />
-            </div>
-
-            <div class="modal-actions">
-              <button class="btn-submit" onclick="ADCMSCabinDefects.submitCabinDefect()">Submit</button>
-              <button class="btn-cancel" onclick="ADCMSCabinDefects.closeAddModal()">Cancel</button>
-            </div>
-          </div>
+        <div id="cabinDefectList" class="defect-list" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+          <!-- Cabin items will be rendered here -->
+          <p style="text-align: center; padding: 40px; color: #888; grid-column: 1/-1;">Loading cabin defects...</p>
         </div>
       </section>
     </main>
+
+    <!-- Modal for Cabin Action -->
+    <div id="cabinActionModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <h3 id="cabinModalTitle" style="margin-top: 0; color: #1e293b;">Update Cabin Action</h3>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Action Taken</label>
+                <textarea id="cabinActionText" rows="3" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: inherit;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Status</label>
+                <select id="cabinStatusSelect" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: white;">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="saveCabinAction" style="flex: 1; background: #10b981; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Save Update</button>
+                <button onclick="document.getElementById('cabinActionModal').style.display='none'" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for New Cabin Defect -->
+    <div id="addCabinDefectModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <h3 style="margin-top: 0; color: #1e293b;">Log New Cabin Issue</h3>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Aircraft</label>
+                <select id="cabinAircraftSelect" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: white;"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Cabin Area / Seat</label>
+                <input type="text" id="cabinAreaInput" placeholder="e.g., Seat 14C, Galley 2" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Issue Description</label>
+                <textarea id="cabinIssueInput" rows="3" placeholder="Describe the defect..." style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: inherit;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #64748b;">Is this a MEL item?</label>
+                <select id="cabinIsMEL" onchange="ADCMSCabin.toggleMELFields()" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; background: white;">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+            </div>
+            <div id="cabinMELFields" style="display: none; background: #fffbeb; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fde68a;">
+                <h4 style="margin-top: 0; color: #92400e; border-bottom: 1px solid #fde68a; padding-bottom: 8px; margin-bottom: 12px;">MEL Details</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #92400e;">Category</label>
+                        <select id="cabinMELCategory" style="width: 100%; padding: 8px; border: 1px solid #fde68a; border-radius: 6px; background: white;">
+                            <option value="A">Cat A</option>
+                            <option value="B">Cat B</option>
+                            <option value="C" selected>Cat C</option>
+                            <option value="D">Cat D</option>
+                            <option value="Connection 1">Connection 1</option>
+                            <option value="Connection 2">Connection 2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #92400e;">MEL Reference</label>
+                        <input type="text" id="cabinMELReference" placeholder="e.g., MEL-25-11-01" style="width: 100%; padding: 8px; border: 1px solid #fde68a; border-radius: 6px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #92400e;">Expiry Date</label>
+                    <input type="date" id="cabinMELExpiry" style="width: 100%; padding: 8px; border: 1px solid #fde68a; border-radius: 6px;">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="ADCMSCabin.submitNewDefect()" style="flex: 1; background: #10b981; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Log Issue</button>
+                <button onclick="document.getElementById('addCabinDefectModal').style.display='none'" style="flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">Cancel</button>
+            </div>
+        </div>
+    </div>
   </div>
 
   <script src="modules/data.js"></script>
   <script src="modules/ui.js"></script>
   <script src="modules/cabin-defects.js"></script>
   <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if(window.ADCMSCabin) window.ADCMSCabin.init();
+    });
+  </script>
 </body>
 </html>
