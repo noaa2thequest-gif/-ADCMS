@@ -47,101 +47,104 @@
 
         <section class="defect-form-panel">
           <div class="defect-form-card">
-            <!-- ========== DEFECT DETAILS ========== -->
-            <div class="section-head"><h3>Defect Details</h3><span id="repeatHint" class="workflow-badge">Ready</span></div>
-            <div class="workflow-grid">
-              <div class="workflow-card">
-                <label>Aircraft (Registration)</label>
-                <select id="newDefectAircraft" class="workflow-input">
-                  <option value="">-- Select Aircraft --</option>
-                </select>
-                <label>Defect Title</label>
-                <input id="newDefectIssue" class="workflow-input" placeholder="e.g., Hydraulic pump noise" />
-                <label>Defect Source</label>
-                <select id="newDefectSource" class="workflow-input">
-                  <option>ECAM Message</option>
-                  <option>Failure Message</option>
-                  <option>Captain Entry</option>
-                  <option>Crew Observation</option>
-                  <option selected>Maintenance Observation</option>
-                  <option>Cabin Defect</option>
-                </select>
-                <label>Description</label>
-                <textarea id="newDefectDescription" class="workflow-textarea" rows="4" placeholder="Describe the defect and initial observations"></textarea>
-              </div>
-              <div class="workflow-card">
-                <label>Report Date</label>
-                <input id="newDefectDate" class="workflow-input" type="date" />
-                <p id="newDefectMessage" class="workflow-hint">A repeat defect will be flagged within 10 days for the same aircraft and issue.</p>
-              </div>
-            </div>
-
-            <!-- ========== MEL SECTION ========== -->
-            <div class="section-head" style="margin-top: 30px;"><h3>MEL Status</h3></div>
-            <div class="workflow-grid">
-              <div class="workflow-card">
-                <label>
-                  <input id="newDefectIsMel" type="checkbox" style="margin-right: 8px;" />
-                  <span>Raise as MEL (Minimum Equipment List)</span>
-                </label>
-                <div id="melSection" style="display: none; margin-top: 20px;">
-                  <label>MEL Category</label>
-                  <select id="newDefectMelCategory" class="workflow-input">
-                    <option value="">-- Select Category --</option>
-                    <option value="A">Category A (Immediate Action)</option>
-                    <option value="B">Category B (3 Days)</option>
-                    <option value="C">Category C (10 Days)</option>
-                    <option value="D">Category D (120 Days)</option>
-                    <option value="Connection 1">Connection 1</option>
-                    <option value="Connection 2">Connection 2</option>
+            <form id="defectForm" onsubmit="return saveDefectForm(event)">
+              <!-- ========== DEFECT DETAILS ========== -->
+              <div class="section-head"><h3>Defect Details</h3><span id="repeatHint" class="workflow-badge">Ready</span></div>
+              <div class="workflow-grid">
+                <div class="workflow-card">
+                  <label>Aircraft (Registration)</label>
+                  <select id="newDefectAircraft" class="workflow-input" required>
+                    <option value="">-- Select Aircraft --</option>
                   </select>
-                  
-                  <label style="margin-top: 15px;">MEL Expiry Date</label>
-                  <input id="newDefectMelExpiry" class="workflow-input" type="date" readonly style="background-color: #f0f0f0;" />
-                  
-                  <label style="margin-top: 15px;">
-                    <input id="newDefectHasExtension" type="checkbox" style="margin-right: 8px;" />
-                    <span>Has Extension (Concession)</span>
-                  </label>
-                  
-                  <div id="extensionSection" style="display: none; margin-top: 15px;">
-                    <label>Extension Type</label>
-                    <select id="newDefectExtensionType" class="workflow-input">
-                      <option value="">-- Select --</option>
-                      <option value="first">First Concession</option>
-                      <option value="second">Second Concession</option>
-                    </select>
-                    
-                    <label style="margin-top: 15px;">New Expiry Date (Manual Entry/Auto Calculated)</label>
-                    <input id="newDefectMelExpiryExtended" class="workflow-input" type="date" />
-                    <p class="workflow-hint" style="font-size: 11px; margin-top: 5px;">You can override the calculated date manually if needed.</p>
-                  </div>
+                  <label>Defect Title</label>
+                  <input id="newDefectIssue" class="workflow-input" placeholder="e.g., Hydraulic pump noise" required />
+                  <label>Defect Source</label>
+                  <select id="newDefectSource" class="workflow-input">
+                    <option>ECAM Message</option>
+                    <option>Failure Message</option>
+                    <option>Captain Entry</option>
+                    <option>Crew Observation</option>
+                    <option selected>Maintenance Observation</option>
+                    <option>Cabin Defect</option>
+                  </select>
+                  <label>Description</label>
+                  <textarea id="newDefectDescription" class="workflow-textarea" rows="4" placeholder="Describe the defect and initial observations" required></textarea>
+                </div>
+                <div class="workflow-card">
+                  <label>Report Date</label>
+                  <input id="newDefectDate" class="workflow-input" type="date" required />
+                  <p id="newDefectMessage" class="workflow-hint">A repeat defect will be flagged within 10 days for the same aircraft and issue.</p>
                 </div>
               </div>
 
-              <div class="workflow-card">
-                <label>Waiting for Spare Parts?</label>
-                <select id="newDefectSparePartsStatus" class="workflow-input">
-                  <option value="no">No</option>
-                  <option value="yes">Yes - Waiting for Parts</option>
-                  <option value="ordered">Yes - Parts Ordered</option>
-                </select>
-                
-                <label style="margin-top: 15px;">Proposed Action</label>
-                <textarea id="newDefectProposedAction" class="workflow-textarea" rows="3" placeholder="Describe the proposed corrective action..."></textarea>
-              </div>
-            </div>
+              <!-- ========== MEL SECTION ========== -->
+              <div class="section-head" style="margin-top: 30px;"><h3>MEL Status</h3></div>
+              <div class="workflow-grid">
+                <div class="workflow-card">
+                  <label>
+                    <input id="newDefectIsMel" type="checkbox" style="margin-right: 8px;" />
+                    <span>Raise as MEL (Minimum Equipment List)</span>
+                  </label>
+                  <div id="melSection" style="display: none; margin-top: 20px;">
+                    <label>MEL Category</label>
+                    <select id="newDefectMelCategory" class="workflow-input">
+                      <option value="">-- Select Category --</option>
+                      <option value="A">Category A (Immediate Action)</option>
+                      <option value="B">Category B (3 Days)</option>
+                      <option value="C">Category C (10 Days)</option>
+                      <option value="D">Category D (120 Days)</option>
+                      <option value="Connection 1">Connection 1</option>
+                      <option value="Connection 2">Connection 2</option>
+                    </select>
+                    
+                    <label style="margin-top: 15px;">MEL Expiry Date</label>
+                    <input id="newDefectMelExpiry" class="workflow-input" type="date" readonly style="background-color: #f0f0f0;" />
+                    
+                    <label style="margin-top: 15px;">
+                      <input id="newDefectHasExtension" type="checkbox" style="margin-right: 8px;" />
+                      <span>Has Extension (Concession)</span>
+                    </label>
+                    
+                    <div id="extensionSection" style="display: none; margin-top: 15px;">
+                      <label>Extension Type</label>
+                      <select id="newDefectExtensionType" class="workflow-input">
+                        <option value="">-- Select --</option>
+                        <option value="first">First Concession</option>
+                        <option value="second">Second Concession</option>
+                      </select>
+                      
+                      <label style="margin-top: 15px;">New Expiry Date (Manual Entry/Auto Calculated)</label>
+                      <input id="newDefectMelExpiryExtended" class="workflow-input" type="date" />
+                      <p class="workflow-hint" style="font-size: 11px; margin-top: 5px;">You can override the calculated date manually if needed.</p>
+                    </div>
+                  </div>
+                </div>
 
-            <!-- ========== ACTION BUTTONS ========== -->
-            <div class="form-actions" style="margin-top: 30px;">
-              <button id="saveDefectBtn" class="workflow-btn" onclick="handleSaveDefect()">Save Defect</button>
-              <a href="index.html" class="workflow-btn secondary" style="text-align:center;text-decoration:none;display:inline-block">Cancel</a>
-            </div>
+                <div class="workflow-card">
+                  <label>Waiting for Spare Parts?</label>
+                  <select id="newDefectSparePartsStatus" class="workflow-input">
+                    <option value="no">No</option>
+                    <option value="yes">Yes - Waiting for Parts</option>
+                    <option value="ordered">Yes - Parts Ordered</option>
+                  </select>
+                  
+                  <label style="margin-top: 15px;">Proposed Action</label>
+                  <textarea id="newDefectProposedAction" class="workflow-textarea" rows="3" placeholder="Describe the proposed corrective action..."></textarea>
+                </div>
+              </div>
+
+              <!-- ========== ACTION BUTTONS ========== -->
+              <div class="form-actions" style="margin-top: 30px;">
+                <button type="submit" class="workflow-btn">Save Defect</button>
+                <a href="index.html" class="workflow-btn secondary" style="text-align:center;text-decoration:none;display:inline-block">Cancel</a>
+              </div>
+            </form>
           </div>
         </section>
       </section>
     </main>
   </div>
+
   <script src="modules/data.js"></script>
   <script src="modules/ui.js"></script>
   <script src="modules/dashboard.js"></script>
@@ -150,10 +153,46 @@
   <script src="app.js"></script>
   
   <script>
-    function handleSaveDefect() {
-      console.log('🔧 Save Defect clicked!');
+    // Initialize form
+    document.addEventListener('DOMContentLoaded', function() {
+      const isMelCheckbox = document.getElementById('newDefectIsMel');
+      const melSection = document.getElementById('melSection');
+      const reportDateInput = document.getElementById('newDefectDate');
       
-      // Get form values
+      // Set today's date
+      if (!reportDateInput.value) {
+        const today = new Date().toISOString().split('T')[0];
+        reportDateInput.value = today;
+      }
+      
+      // Toggle MEL section
+      if (isMelCheckbox) {
+        isMelCheckbox.addEventListener('change', function() {
+          melSection.style.display = this.checked ? 'block' : 'none';
+        });
+      }
+      
+      // Load aircraft list
+      if (window.ADCMSData && typeof window.ADCMSData.getAircraft === 'function') {
+        Promise.resolve(window.ADCMSData.getAircraft()).then(function(aircraft) {
+          const select = document.getElementById('newDefectAircraft');
+          if (aircraft && Array.isArray(aircraft)) {
+            aircraft.forEach(function(ac) {
+              const option = document.createElement('option');
+              option.value = ac.registration;
+              option.textContent = ac.registration + ' (' + ac.model + ')';
+              select.appendChild(option);
+            });
+          }
+        });
+      }
+    });
+    
+    // Form submission handler
+    function saveDefectForm(event) {
+      event.preventDefault();
+      console.log('📝 Form submitted!');
+      
       const aircraft = document.getElementById('newDefectAircraft').value;
       const issue = document.getElementById('newDefectIssue').value;
       const source = document.getElementById('newDefectSource').value;
@@ -165,20 +204,18 @@
       const sparePartsStatus = document.getElementById('newDefectSparePartsStatus').value;
       const proposedAction = document.getElementById('newDefectProposedAction').value;
       
-      console.log('Form data:', { aircraft, issue, description, reportDate });
-      
       // Validation
       if (!aircraft || !issue || !description || !reportDate) {
-        alert('❌ Please fill in all required fields:\n- Aircraft\n- Title\n- Description\n- Date');
-        return;
+        alert('❌ Please fill all required fields!');
+        return false;
       }
       
       if (isMel && !melCategory) {
-        alert('❌ Please select a MEL Category');
-        return;
+        alert('❌ Please select MEL Category!');
+        return false;
       }
       
-      // Create defect object
+      // Create defect
       const newDefect = {
         id: 'defect-' + Date.now(),
         aircraft: aircraft,
@@ -195,23 +232,23 @@
         createdAt: new Date().toISOString()
       };
       
-      console.log('📝 New defect:', newDefect);
+      console.log('💾 Saving defect:', newDefect);
       
-      // Save to localStorage (reliable fallback)
+      // Save to localStorage
       try {
         let defects = JSON.parse(localStorage.getItem('defects') || '[]');
         defects.push(newDefect);
         localStorage.setItem('defects', JSON.stringify(defects));
-        console.log('✅ Defect saved to localStorage!');
+        console.log('✅ Saved to localStorage!');
         
-        // Also try Firebase if available
+        // Try Firebase
         if (window.ADCMSData && typeof window.ADCMSData.addDefect === 'function') {
           window.ADCMSData.addDefect(newDefect).catch(function(e) {
-            console.warn('Firebase save failed, but localStorage saved:', e);
+            console.warn('Firebase failed, localStorage saved:', e);
           });
         }
         
-        alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue);
+        alert('✅ Defect saved!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue);
         
         // Redirect
         setTimeout(function() {
@@ -219,8 +256,10 @@
         }, 500);
       } catch (error) {
         console.error('❌ Error:', error);
-        alert('❌ Error saving defect: ' + error.message);
+        alert('❌ Error: ' + error.message);
       }
+      
+      return false;
     }
   </script>
 </body>
