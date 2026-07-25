@@ -134,7 +134,7 @@
 
             <!-- ========== ACTION BUTTONS ========== -->
             <div class="form-actions" style="margin-top: 30px;">
-              <button id="saveDefectBtn" class="workflow-btn">Save Defect</button>
+              <button id="saveDefectBtn" class="workflow-btn" onclick="handleSaveDefect()">Save Defect</button>
               <a href="index.html" class="workflow-btn secondary" style="text-align:center;text-decoration:none;display:inline-block">Cancel</a>
             </div>
           </div>
@@ -148,5 +148,74 @@
   <script src="modules/workflow.js"></script>
   <script src="modules/new-defect-final.js"></script>
   <script src="app.js"></script>
+  
+  <script>
+    function handleSaveDefect() {
+      console.log('🔧 Save Defect clicked!');
+      
+      // Get form values
+      const aircraft = document.getElementById('newDefectAircraft').value;
+      const issue = document.getElementById('newDefectIssue').value;
+      const source = document.getElementById('newDefectSource').value;
+      const description = document.getElementById('newDefectDescription').value;
+      const reportDate = document.getElementById('newDefectDate').value;
+      const isMel = document.getElementById('newDefectIsMel').checked;
+      const melCategory = document.getElementById('newDefectMelCategory').value;
+      const melExpiry = document.getElementById('newDefectMelExpiry').value;
+      const sparePartsStatus = document.getElementById('newDefectSparePartsStatus').value;
+      const proposedAction = document.getElementById('newDefectProposedAction').value;
+      
+      console.log('Form data:', { aircraft, issue, description, reportDate });
+      
+      // Validation
+      if (!aircraft || !issue || !description || !reportDate) {
+        alert('❌ Please fill in all required fields:\n- Aircraft\n- Title\n- Description\n- Date');
+        return;
+      }
+      
+      if (isMel && !melCategory) {
+        alert('❌ Please select a MEL Category');
+        return;
+      }
+      
+      // Create defect object
+      const newDefect = {
+        id: 'defect-' + Date.now(),
+        aircraft: aircraft,
+        issue: issue,
+        source: source,
+        description: description,
+        reportDate: reportDate,
+        status: 'Open',
+        isMel: isMel,
+        melCategory: isMel ? melCategory : null,
+        melExpiry: isMel ? melExpiry : null,
+        sparePartsStatus: sparePartsStatus,
+        proposedAction: proposedAction,
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('📝 New defect:', newDefect);
+      
+      // Save to Firebase
+      if (window.ADCMSData && typeof window.ADCMSData.addDefect === 'function') {
+        window.ADCMSData.addDefect(newDefect).then(function() {
+          console.log('✅ Defect saved!');
+          alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue);
+          
+          // Redirect
+          setTimeout(function() {
+            window.location.href = 'defect.html?defectId=' + newDefect.id;
+          }, 500);
+        }).catch(function(error) {
+          console.error('❌ Error:', error);
+          alert('❌ Error saving defect: ' + error.message);
+        });
+      } else {
+        console.error('❌ ADCMSData not available!');
+        alert('❌ System not ready. Please refresh the page.');
+      }
+    }
+  </script>
 </body>
 </html>
