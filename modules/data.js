@@ -22,6 +22,8 @@
   let defectsList = [];
   let inventoryList = [];
   let cabinDefects = [];
+  let dataChangeCallbacks = [];
+  let isInitialized = false;
 
   function calculateMelExpiry(openDate, melCategory) {
     if (!openDate || !melCategory) return null;
@@ -38,60 +40,75 @@
     return date.toISOString().split('T')[0];
   }
 
+  function notifyDataChange() {
+    dataChangeCallbacks.forEach(cb => {
+      try {
+        cb();
+      } catch (e) {
+        console.error('Data change callback error:', e);
+      }
+    });
+  }
+
   async function initFirebase() {
+    if (isInitialized) {
+      console.log('✅ Firebase already initialized');
+      return true;
+    }
+
     try {
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
-      const { getDatabase, ref, get, set, remove } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
+      const { getDatabase, ref, onValue, set, remove } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
       
       const app = initializeApp(firebaseConfig);
       db = getDatabase(app);
 
-      // Load all data from Firebase
-      const dbRef = ref(db);
-      const snapshot = await get(dbRef);
-      
-      if (snapshot.exists()) {
+      // Listen to Aircraft changes
+      onValue(ref(db, 'aircraft'), (snapshot) => {
         const data = snapshot.val();
-        aircraftFleet = data.aircraft ? Object.values(data.aircraft) : [];
-        defectsList = data.defects ? Object.values(data.defects) : [];
-        inventoryList = data.stores ? Object.values(data.stores) : [];
-        cabinDefects = data.cabinDefects ? Object.values(data.cabinDefects) : [];
-      }
+        aircraftFleet = data ? Object.values(data) : [];
+        console.log('📡 Aircraft updated:', aircraftFleet.length);
+        notifyDataChange();
+      });
 
-      console.log('✅ Firebase loaded successfully');
+      // Listen to Defects changes
+      onValue(ref(db, 'defects'), (snapshot) => {
+        const data = snapshot.val();
+        defectsList = data ? Object.values(data) : [];
+        console.log('📡 Defects updated:', defectsList.length);
+        notifyDataChange();
+      });
+
+      // Listen to Stores changes
+      onValue(ref(db, 'stores'), (snapshot) => {
+        const data = snapshot.val();
+        inventoryList = data ? Object.values(data) : [];
+        console.log('📡 Stores updated:', inventoryList.length);
+        notifyDataChange();
+      });
+
+      // Listen to Cabin Defects changes
+      onValue(ref(db, 'cabinDefects'), (snapshot) => {
+        const data = snapshot.val();
+        cabinDefects = data ? Object.values(data) : [];
+        console.log('📡 Cabin Defects updated:', cabinDefects.length);
+        notifyDataChange();
+      });
+
+      isInitialized = true;
+      console.log('✅ Firebase initialized successfully');
       return true;
     } catch (e) {
-      console.error('Firebase init error:', e);
+      console.error('❌ Firebase init error:', e);
       return false;
     }
   }
 
-  async function saveToFirebase() {
+  async function saveToFirebase(path, data) {
     if (!db) return;
     try {
       const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-      
-      const data = {
-        aircraft: {},
-        defects: {},
-        stores: {},
-        cabinDefects: {}
-      };
-
-      aircraftFleet.forEach((ac, i) => {
-        data.aircraft[ac.id || `ac-${i}`] = ac;
-      });
-      defectsList.forEach((def, i) => {
-        data.defects[def.id || `def-${i}`] = def;
-      });
-      inventoryList.forEach((inv, i) => {
-        data.stores[inv.id || `inv-${i}`] = inv;
-      });
-      cabinDefects.forEach((cd, i) => {
-        data.cabinDefects[cd.id || `cd-${i}`] = cd;
-      });
-
-      await set(ref(db), data);
+      await set(ref(db, path), data);
     } catch (e) {
       console.warn('Firebase save error:', e);
     }
@@ -100,59 +117,148 @@
   return {
     initCloud: initFirebase,
 
-    getAircraft: () => aircraftFleet,
-    addAircraft: (aircraft) => {
-      aircraftFleet.push(aircraft);
-      saveToFirebase();
+    // Aircraft methods
+    getAircraft: async () => {
+      if (!isInitialized) await initFirebase();
+      return aircraftFleet;
     },
-    updateAircraft: (id, updates) => {
+    
+    addAircraft: async (aircraft) => {
+      if (!isInitialized) await initFirebase();
+      aircraft.id = aircraft.id || 'ac-' + Date.now();
+      aircraftFleet.push(aircraft);
+      const data = {};
+      aircraftFleet.forEach(ac => {
+        data[ac.id] = ac;
+      });
+      await saveToFirebase('aircraft', data);
+      notifyDataChange();
+    },
+    
+    updateAircraft: async (id, updates) => {
+      if (!isInitialized) await initFirebase();
       const idx = aircraftFleet.findIndex(a => a.id === id);
       if (idx !== -1) {
         aircraftFleet[idx] = { ...aircraftFleet[idx], ...updates };
-        saveToFirebase();
+        const data = {};
+        aircraftFleet.forEach(ac => {
+          data[ac.id] = ac;
+        });
+        await saveToFirebase('aircraft', data);
+        notifyDataChange();
       }
     },
-    deleteAircraft: (id) => {
+    
+    deleteAircraft: async (id) => {
+      if (!isInitialized) await initFirebase();
       aircraftFleet = aircraftFleet.filter(a => a.id !== id);
-      saveToFirebase();
+      const data = {};
+      aircraftFleet.forEach(ac => {
+        data[ac.id] = ac;
+      });
+      await saveToFirebase('aircraft', data);
+      notifyDataChange();
     },
 
-    getDefects: () => defectsList,
-    addDefect: (defect) => {
-      defectsList.push(defect);
-      saveToFirebase();
+    // Defects methods
+    getDefects: async () => {
+      if (!isInitialized) await initFirebase();
+      return defectsList;
     },
-    updateDefect: (id, updates) => {
+    
+    addDefect: async (defect) => {
+      if (!isInitialized) await initFirebase();
+      defect.id = defect.id || 'def-' + Date.now();
+      defectsList.push(defect);
+      const data = {};
+      defectsList.forEach(def => {
+        data[def.id] = def;
+      });
+      await saveToFirebase('defects', data);
+      notifyDataChange();
+    },
+    
+    updateDefect: async (id, updates) => {
+      if (!isInitialized) await initFirebase();
       const idx = defectsList.findIndex(d => d.id === id);
       if (idx !== -1) {
         defectsList[idx] = { ...defectsList[idx], ...updates };
-        saveToFirebase();
+        const data = {};
+        defectsList.forEach(def => {
+          data[def.id] = def;
+        });
+        await saveToFirebase('defects', data);
+        notifyDataChange();
       }
     },
-    deleteDefect: (id) => {
+    
+    deleteDefect: async (id) => {
+      if (!isInitialized) await initFirebase();
       defectsList = defectsList.filter(d => d.id !== id);
-      saveToFirebase();
+      const data = {};
+      defectsList.forEach(def => {
+        data[def.id] = def;
+      });
+      await saveToFirebase('defects', data);
+      notifyDataChange();
     },
 
-    getInventory: () => inventoryList,
-    addInventoryItem: (item) => {
-      inventoryList.push(item);
-      saveToFirebase();
+    // Inventory methods
+    getInventory: async () => {
+      if (!isInitialized) await initFirebase();
+      return inventoryList;
     },
-    updateInventoryItem: (id, updates) => {
+    
+    addInventoryItem: async (item) => {
+      if (!isInitialized) await initFirebase();
+      item.id = item.id || 'inv-' + Date.now();
+      inventoryList.push(item);
+      const data = {};
+      inventoryList.forEach(inv => {
+        data[inv.id] = inv;
+      });
+      await saveToFirebase('stores', data);
+      notifyDataChange();
+    },
+    
+    updateInventoryItem: async (id, updates) => {
+      if (!isInitialized) await initFirebase();
       const idx = inventoryList.findIndex(i => i.id === id);
       if (idx !== -1) {
         inventoryList[idx] = { ...inventoryList[idx], ...updates };
-        saveToFirebase();
+        const data = {};
+        inventoryList.forEach(inv => {
+          data[inv.id] = inv;
+        });
+        await saveToFirebase('stores', data);
+        notifyDataChange();
       }
     },
 
-    getCabinDefects: () => cabinDefects,
-    addCabinDefect: (defect) => {
+    // Cabin Defects methods
+    getCabinDefects: async () => {
+      if (!isInitialized) await initFirebase();
+      return cabinDefects;
+    },
+    
+    addCabinDefect: async (defect) => {
+      if (!isInitialized) await initFirebase();
+      defect.id = defect.id || 'cd-' + Date.now();
       cabinDefects.push(defect);
-      saveToFirebase();
+      const data = {};
+      cabinDefects.forEach(cd => {
+        data[cd.id] = cd;
+      });
+      await saveToFirebase('cabinDefects', data);
+      notifyDataChange();
     },
 
+    // Callbacks
+    onDataChange: (callback) => {
+      dataChangeCallbacks.push(callback);
+    },
+
+    // Utilities
     calculateMelExpiry
   };
 });
