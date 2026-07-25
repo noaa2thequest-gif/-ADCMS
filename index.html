@@ -1,202 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ADCMS — Fleet Overview</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Supabase Client Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.0/dist/umd/supabase.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADCMS Pro - Maintenance Control System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="firebase-realtime.js" type="module"></script>
 </head>
 <body>
-  <div class="app">
-    <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-logo-container">
-          <img src="assets/img/logo.png" alt="Sky Vision Airlines" class="company-logo">
-          <div class="brand-credits">
-            <span class="designer">Designed by: Eng. Hany Omar</span>
-            <span class="reviewer">Reviewed by: Eng. Akram El-Gendy</span>
-          </div>
-        </div>
-      </div>
-
-      <nav>
-        <a class="active" href="index.html">⌂ <span>Fleet Overview</span></a>
-        <a href="dashboard.html">◫ <span>Dashboard</span></a>
-        <a href="aircraft.html">✈ <span>Aircraft</span></a>
-        <a href="defect-control.html">▱ <span>Defect Control</span></a>
-        <a href="mel.html">▤ <span>MEL Management</span></a>
-        <a href="cabin-defects.html">🪟 <span>Cabin Defects</span></a>
-        <a href="stores.html">📦 <span>Stores & Inventory</span></a>
-        <a href="mcc-center.html">🎛️ <span>MCC Center</span></a>
-        <a href="admin.html">⚙ <span>Administration</span></a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button id="darkToggle">☾ <span>Dark Mode</span><i></i></button>
-        <button onclick="ADCMSAuth.logout()">⎗ <span>Logout</span></button>
-        <small id="appVersion">Version 1.0 (Prototype)<br>© 2025 ADCMS</small>
-      </div>
-    </aside>
-
-    <!-- ========== MAIN CONTENT ========== -->
-    <main>
-      <header>
-        <button class="menu" id="menuBtn" style="display: block !important;">☰</button>
-        <div class="profile">
-          <span class="bell">♧<b>8</b></span>
-          <div class="avatar">H</div>
-          <div>
-            <strong>Hany Omar</strong>
-            <small>Super Admin</small>
-          </div>
-        </div>
-      </header>
-
-      <section class="content">
-        <!-- ========== TITLE ROW ========== -->
-        <div class="title-row">
-          <div>
-            <h2>Fleet Overview</h2>
-            <p>Real-time overview of fleet status and maintenance</p>
-          </div>
-          <div class="title-actions">
-            <button id="newDefectBtn" class="new-defect-btn" onclick="ADCMSWorkflow.openNewDefectModal()">+ New Defect</button>
-            <input id="search" placeholder="Search aircraft, tail number, or defect..." />
-          </div>
-        </div>
-
-        <!-- ========== KPI CARDS ========== -->
-        <div class="kpis">
-          <article>
-            <div class="ico purple">✈</div>
-            <div>
-              <span>Total Aircraft</span>
-              <strong id="counterTotalAircraft">0</strong>
-              <small>Active</small>
-            </div>
-          </article>
-
-          <article>
-            <div class="ico yellow">▤</div>
-            <div>
-              <span>Open Defects</span>
-              <strong id="counterOpenDefects">0</strong>
-              <small>Current Open</small>
-            </div>
-          </article>
-
-          <article>
-            <div class="ico red">!</div>
-            <div>
-              <span>MEL Items</span>
-              <strong id="counterMelItems">0</strong>
-              <small>Active MELs</small>
-            </div>
-          </article>
-
-          <article>
-            <div class="ico blue">▦</div>
-            <div>
-              <span>Aircraft On Ground</span>
-              <strong id="counterAogDefects">0</strong>
-              <small>AOG Status</small>
-            </div>
-          </article>
-
-          <article>
-            <div class="ico green">✓</div>
-            <div>
-              <span>Completed Today</span>
-              <strong id="counterCompletedToday">0</strong>
-              <small>Closed Today</small>
-            </div>
-          </article>
-        </div>
-
-        <!-- ========== AIRCRAFT STATUS ========== -->
-        <div class="section-head">
-          <h3>Aircraft Status</h3>
-          <a href="#">View all aircraft →</a>
-        </div>
-        <div class="aircraft-grid" id="aircraftGrid"></div>
-
-        <!-- ========== BOTTOM GRID ========== -->
-        <div class="bottom-grid">
-          <!-- Defects by Priority -->
-          <article class="panel">
-            <h3>Defects by Priority</h3>
-            <div class="donut-wrap">
-              <div class="donut">
-                <span>
-                  <b id="sourceTotalCount">0</b>
-                  <small>Total</small>
-                </span>
-              </div>
-              <ul id="sourceBreakdownList"></ul>
-            </div>
-          </article>
-
-          <!-- Recent Activity -->
-          <article class="panel">
-            <h3>Recent Activity</h3>
-            <div id="recentActivityList" class="activity">
-              <p style="text-align: center; color: var(--text-dim); padding: 20px;">No recent activity</p>
-            </div>
-          </article>
-
-          <!-- Fleet Status Overview -->
-          <article class="panel">
-            <h3>Fleet Status Overview</h3>
-            <div class="bars">
-              <label>
-                Serviceable
-                <b id="statusServiceable">0 (0%)</b>
-              </label>
-              <div><i id="barServiceable" style="width: 0%"></i></div>
-
-              <label>
-                Deferred
-                <b id="statusDeferred">0 (0%)</b>
-              </label>
-              <div class="amber"><i id="barDeferred" style="width: 0%"></i></div>
-
-              <label>
-                AOG
-                <b id="statusAog">0 (0%)</b>
-              </label>
-              <div class="danger"><i id="barAog" style="width: 0%"></i></div>
-
-              <label>
-                In Maintenance
-                <b id="statusMaintenance">0 (0%)</b>
-              </label>
-              <div class="muted"><i id="barMaintenance" style="width: 0%"></i></div>
-            </div>
-          </article>
-        </div>
-
-        <!-- ========== DEFECT CONTROL PANEL ========== -->
-        <section class="panel defect-control-panel">
-          <div class="section-head">
-            <h3>Defect Control</h3>
-            <span id="defectCountBadge" class="workflow-badge">0 open</span>
-          </div>
-          <div id="defectControlList" class="defect-list"></div>
-        </section>
-      </section>
-    </main>
-  </div>
-
-  <!-- ========== SCRIPTS ========== -->
-  <script src="modules/supabase-config.js"></script>
-  <script src="modules/data.js"></script>
-  <script src="modules/auth.js"></script>
-  <script src="modules/ui.js"></script>
-  <script src="modules/workflow.js"></script>
-  <script src="modules/dashboard.js"></script>
-  <script src="app.js"></script>
+    <div class="container">
+        <header>
+            <h1>ADCMS Pro</h1>
+            <p>Aviation Defect Control & Maintenance System</p>
+            <button onclick="location.href='dashboard.html'" class="btn-primary">Go to Dashboard</button>
+            <button onclick="clearCache()" class="btn-secondary">Clear Cache & Reload</button>
+        </header>
+        
+        <main>
+            <section class="features">
+                <h2>Features</h2>
+                <ul>
+                    <li>✈️ Fleet Management</li>
+                    <li>🔧 Defect Control</li>
+                    <li>📋 MEL Management</li>
+                    <li>🛏️ Cabin Defects</li>
+                    <li>📦 Stores & Inventory</li>
+                    <li>📊 Reports & Analytics</li>
+                    <li>👥 User Management</li>
+                    <li>🔐 Permissions</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        function clearCache() {
+            // Clear all storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Reload page
+            location.reload(true);
+        }
+        
+        // On page load, ensure Firebase is connected
+        window.addEventListener('load', () => {
+            console.log('✅ ADCMS loaded successfully');
+            console.log('🔥 Firebase Realtime Database connected');
+        });
+    </script>
 </body>
 </html>

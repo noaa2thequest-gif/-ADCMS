@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ADCMS - Clear Cache</title>
+</head>
+<body>
+    <h1>Clearing ADCMS Cache...</h1>
+    <p id="status">Processing...</p>
+    
+    <script>
+        // Clear all localStorage
+        localStorage.clear();
+        
+        // Clear all sessionStorage
+        sessionStorage.clear();
+        
+        // Clear IndexedDB
+        if (window.indexedDB) {
+            const dbs = await indexedDB.databases();
+            dbs.forEach(db => {
+                indexedDB.deleteDatabase(db.name);
+            });
+        }
+        
+        // Clear service workers
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(registration => {
+                    registration.unregister();
+                });
+            });
+        }
+        
+        // Clear cookies
+        document.cookie.split(";").forEach(c => {
+            document.cookie = c
+                .replace(/^ +/, "")
+                .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+        
+        document.getElementById('status').innerHTML = '✅ Cache cleared! Redirecting...';
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+            window.location.href = '/index.html';
+        }, 2000);
+    </script>
+</body>
+</html>
