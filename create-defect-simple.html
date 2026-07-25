@@ -38,6 +38,16 @@
       font-size: 14px;
     }
     
+    .section-title {
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 25px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #007bff;
+    }
+    
     .alert {
       padding: 15px;
       border-radius: 5px;
@@ -246,6 +256,24 @@
         <input type="date" id="date" required />
       </div>
       
+      <!-- MAINTENANCE ACTION SECTION -->
+      <div class="section-title">Maintenance Log Entry</div>
+      
+      <!-- Maintenance Action -->
+      <div class="form-group">
+        <label for="maintenanceAction" class="required">Action Taken (What was done?)</label>
+        <textarea id="maintenanceAction" placeholder="Describe the maintenance action taken..." required></textarea>
+      </div>
+      
+      <!-- Required Maintenance Action -->
+      <div class="form-group">
+        <label for="requiredAction" class="required">Next Action (Proposed Step)</label>
+        <textarea id="requiredAction" placeholder="Describe the next required maintenance action..." required></textarea>
+      </div>
+      
+      <!-- MEL SECTION -->
+      <div class="section-title">MEL Status</div>
+      
       <!-- MEL Checkbox -->
       <div class="checkbox-group">
         <input type="checkbox" id="isMel" />
@@ -340,18 +368,22 @@
         const source = document.getElementById('source').value;
         const description = document.getElementById('description').value;
         const date = document.getElementById('date').value;
+        const maintenanceAction = document.getElementById('maintenanceAction').value;
+        const requiredAction = document.getElementById('requiredAction').value;
         const isMel = document.getElementById('isMel').checked;
         const melCategory = document.getElementById('melCategory').value;
         const melReference = document.getElementById('melReference').value;
         
         console.log('📋 Form data:', {
-          aircraftId, title, source, description, date, isMel, melCategory, melReference
+          aircraftId, title, source, description, date, maintenanceAction, requiredAction, isMel, melCategory, melReference
         });
         
         // Validation
         if (!aircraftId) throw new Error('❌ Please select an aircraft');
         if (!title) throw new Error('❌ Please enter a defect title');
         if (!description) throw new Error('❌ Please enter a description');
+        if (!maintenanceAction) throw new Error('❌ Please enter maintenance action taken');
+        if (!requiredAction) throw new Error('❌ Please enter next required action');
         if (isMel && !melCategory) throw new Error('❌ Please select a MEL category');
         
         // Create defect object
@@ -363,6 +395,8 @@
           source: source,
           description: description,
           date: date,
+          maintenanceAction: maintenanceAction,
+          requiredAction: requiredAction,
           status: 'Open',
           createdAt: new Date().toISOString()
         };
