@@ -5,38 +5,7 @@
     module.exports = api;
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this, function(root) {
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyDUMuUM-CSRsT4u8hlQ4YtWQNK69F3weSc",
-    authDomain: "adcms-realtime.firebaseapp.com",
-    databaseURL: "https://adcms-realtime-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "adcms-realtime",
-    storageBucket: "adcms-realtime.firebasestorage.app",
-    messagingSenderId: "197073995350",
-    appId: "1:197073995350:web:74462049fc06b354dd9df7",
-    measurementId: "G-E5VDB5XQCS"
-  };
-
-  // Initialize Firebase
-  let database = null;
-  let firebaseReady = false;
-
-  async function initFirebase() {
-    try {
-      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
-      const { getDatabase } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-      
-      const app = initializeApp(firebaseConfig);
-      database = getDatabase(app);
-      firebaseReady = true;
-      console.log('✅ Firebase initialized');
-      return true;
-    } catch (e) {
-      console.warn('Firebase init failed:', e);
-      return false;
-    }
-  }
-
+  
   // Helper to calculate MEL expiry
   function calculateMelExpiry(openDate, melCategory) {
     if (!openDate || !melCategory) return null;
@@ -53,134 +22,84 @@
     return date.toISOString().split('T')[0];
   }
 
-  // Data storage
-  let aircraftFleet = [];
-  let defectsList = [];
-  let inventoryList = [];
-  let cabinDefects = [];
-
-  // Load from Firebase
-  async function loadFromFirebase() {
-    if (!firebaseReady) {
-      await initFirebase();
-    }
-
+  // Load from localStorage - NO DEFAULT DATA
+  function loadFromLocalStorage(key) {
     try {
-      const { ref, get } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-      
-      // Load aircraft
-      const aircraftRef = ref(database, 'aircraft');
-      const aircraftSnap = await get(aircraftRef);
-      aircraftFleet = aircraftSnap.val() ? Object.values(aircraftSnap.val()) : [];
-      
-      // Load defects
-      const defectsRef = ref(database, 'defects');
-      const defectsSnap = await get(defectsRef);
-      defectsList = defectsSnap.val() ? Object.values(defectsSnap.val()) : [];
-      
-      // Load inventory
-      const inventoryRef = ref(database, 'stores');
-      const inventorySnap = await get(inventoryRef);
-      inventoryList = inventorySnap.val() ? Object.values(inventorySnap.val()) : [];
-      
-      // Load cabin defects
-      const cabinRef = ref(database, 'cabinDefects');
-      const cabinSnap = await get(cabinRef);
-      cabinDefects = cabinSnap.val() ? Object.values(cabinSnap.val()) : [];
-      
-      console.log('✅ Data loaded from Firebase');
-      return true;
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : [];
     } catch (e) {
-      console.warn('Failed to load from Firebase:', e);
-      return false;
+      console.warn(`Failed to load ${key}:`, e);
+      return [];
     }
   }
 
-  // Save to Firebase
-  async function saveToFirebase() {
-    if (!firebaseReady) {
-      await initFirebase();
-    }
+  // Data storage - START EMPTY
+  let aircraftFleet = loadFromLocalStorage('adcms-aircraft');
+  let defectsList = loadFromLocalStorage('adcms-defects');
+  let inventoryList = loadFromLocalStorage('adcms-inventory');
+  let cabinDefects = loadFromLocalStorage('adcms-cabin-defects');
 
+  function persist() {
     try {
-      const { ref, set } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js');
-      
-      // Save aircraft
-      if (aircraftFleet.length > 0) {
-        const aircraftObj = {};
-        aircraftFleet.forEach((ac, idx) => {
-          aircraftObj[ac.id || `ac-${idx}`] = ac;
-        });
-        await set(ref(database, 'aircraft'), aircraftObj);
-      }
-      
-      // Save defects
-      if (defectsList.length > 0) {
-        const defectsObj = {};
-        defectsList.forEach((def, idx) => {
-          defectsObj[def.id || `def-${idx}`] = def;
-        });
-        await set(ref(database, 'defects'), defectsObj);
-      }
-      
-      console.log('✅ Data saved to Firebase');
-      return true;
+      localStorage.setItem('adcms-aircraft', JSON.stringify(aircraftFleet));
+      localStorage.setItem('adcms-defects', JSON.stringify(defectsList));
+      localStorage.setItem('adcms-inventory', JSON.stringify(inventoryList));
+      localStorage.setItem('adcms-cabin-defects', JSON.stringify(cabinDefects));
     } catch (e) {
-      console.warn('Failed to save to Firebase:', e);
-      return false;
+      console.warn('Failed to persist data:', e);
     }
   }
 
   return {
-    initCloud: loadFromFirebase,
+    initCloud: async () => true,
 
-    // Aircraft methods
+    // Aircraft
     getAircraft: () => aircraftFleet,
     addAircraft: (aircraft) => {
       aircraftFleet.push(aircraft);
-      saveToFirebase();
+      persist();
     },
     updateAircraft: (id, updates) => {
       const idx = aircraftFleet.findIndex(a => a.id === id);
       if (idx !== -1) {
         aircraftFleet[idx] = { ...aircraftFleet[idx], ...updates };
-        saveToFirebase();
+        persist();
       }
     },
     deleteAircraft: (id) => {
       aircraftFleet = aircraftFleet.filter(a => a.id !== id);
-      saveToFirebase();
+      persist();
     },
 
-    // Defects methods
+    // Defects
     getDefects: () => defectsList,
     addDefect: (defect) => {
       defectsList.push(defect);
-      saveToFirebase();
+      persist();
     },
     updateDefect: (id, updates) => {
       const idx = defectsList.findIndex(d => d.id === id);
       if (idx !== -1) {
         defectsList[idx] = { ...defectsList[idx], ...updates };
-        saveToFirebase();
+        persist();
       }
     },
     deleteDefect: (id) => {
       defectsList = defectsList.filter(d => d.id !== id);
-      saveToFirebase();
+      persist();
     },
 
-    // Inventory methods
+    // Inventory
     getInventory: () => inventoryList,
     addInventoryItem: (item) => {
       inventoryList.push(item);
-      saveToFirebase();
+      persist();
     },
     updateInventoryItem: (id, updates) => {
       const idx = inventoryList.findIndex(i => i.id === id);
       if (idx !== -1) {
         inventoryList[idx] = { ...inventoryList[idx], ...updates };
-        saveToFirebase();
+        persist();
       }
     },
 
@@ -188,7 +107,7 @@
     getCabinDefects: () => cabinDefects,
     addCabinDefect: (defect) => {
       cabinDefects.push(defect);
-      saveToFirebase();
+      persist();
     },
 
     // Utility
