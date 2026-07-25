@@ -12,15 +12,16 @@ import {
   push
 } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
 
-// Firebase Configuration
+// Firebase Configuration - UPDATED
 const firebaseConfig = {
-  apiKey: "AIzaSyDWsCg7lJXb1JXBZ5vDlBpQRyEmxoM11O",
+  apiKey: "AIzaSyDUMuUM-CSRsT4u8hlQ4YtWQNK69F3weSc",
   authDomain: "adcms-realtime.firebaseapp.com",
-  databaseURL: "https://adcms-realtime-default-rtdb.firebaseio.com",
+  databaseURL: "https://adcms-realtime-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "adcms-realtime",
-  storageBucket: "adcms-realtime.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  storageBucket: "adcms-realtime.firebasestorage.app",
+  messagingSenderId: "197073995350",
+  appId: "1:197073995350:web:74462049fc06b354dd9df7",
+  measurementId: "G-E5VDB5XQCS"
 };
 
 // Initialize Firebase
