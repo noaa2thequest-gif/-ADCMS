@@ -705,6 +705,38 @@
                 <input type="date" id="date" required />
               </div>
               
+              <div class="form-group">
+                <label for="requestedBy" class="required">Reported By (Name)</label>
+                <input type="text" id="requestedBy" placeholder="e.g., John Smith" required />
+              </div>
+              
+              <div class="section-title">Spare Part Information</div>
+              
+              <div class="form-group">
+                <label for="sparePart" class="required">Spare Part Name</label>
+                <input type="text" id="sparePart" placeholder="e.g., Hydraulic Pump Assembly" required />
+              </div>
+              
+              <div class="form-group">
+                <label for="sparePartRequiredDate" class="required">Spare Part Required Date</label>
+                <input type="date" id="sparePartRequiredDate" required />
+              </div>
+              
+              <div class="form-group">
+                <label for="sparePartRequestedBy" class="required">Spare Part Requested By</label>
+                <input type="text" id="sparePartRequestedBy" placeholder="e.g., Maintenance Manager" required />
+              </div>
+              
+              <div class="form-group">
+                <label for="sparePartStatus" class="required">Spare Part Status</label>
+                <select id="sparePartStatus" required>
+                  <option value="Ordered">Ordered</option>
+                  <option value="In Transit">In Transit</option>
+                  <option value="Received">Received</option>
+                  <option value="Installed">Installed</option>
+                </select>
+              </div>
+              
               <div class="section-title">Maintenance Log Entry</div>
               
               <div class="form-group">
@@ -713,8 +745,23 @@
               </div>
               
               <div class="form-group">
+                <label for="actionTakenBy" class="required">Action Taken By</label>
+                <input type="text" id="actionTakenBy" placeholder="e.g., Technician Name" required />
+              </div>
+              
+              <div class="form-group">
                 <label for="requiredAction" class="required">Next Action</label>
                 <textarea id="requiredAction" placeholder="Describe the next required maintenance action..." required></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="nextActionResponsible" class="required">Next Action Responsible</label>
+                <input type="text" id="nextActionResponsible" placeholder="e.g., Supervisor Name" required />
+              </div>
+              
+              <div class="form-group">
+                <label for="nextActionDeadline" class="required">Next Action Deadline</label>
+                <input type="date" id="nextActionDeadline" required />
               </div>
               
               <div class="section-title">MEL Status</div>
@@ -882,8 +929,16 @@
         const source = document.getElementById('source').value;
         const description = document.getElementById('description').value;
         const date = document.getElementById('date').value;
-        const maintenanceAction = document.getElementById('maintenanceAction').value;
-        const requiredAction = document.getElementById('requiredAction').value;
+        const requestedBy = document.getElementById("requestedBy").value;
+        const sparePart = document.getElementById("sparePart").value;
+        const sparePartRequiredDate = document.getElementById("sparePartRequiredDate").value;
+        const sparePartRequestedBy = document.getElementById("sparePartRequestedBy").value;
+        const sparePartStatus = document.getElementById("sparePartStatus").value;
+        const maintenanceAction = document.getElementById("maintenanceAction").value;
+        const actionTakenBy = document.getElementById("actionTakenBy").value;
+        const requiredAction = document.getElementById("requiredAction").value;
+        const nextActionResponsible = document.getElementById("nextActionResponsible").value;
+        const nextActionDeadline = document.getElementById("nextActionDeadline").value;
         const isMel = document.getElementById('isMel').checked;
         const melCategory = document.getElementById('melCategory').value;
         const melReference = document.getElementById('melReference').value;
