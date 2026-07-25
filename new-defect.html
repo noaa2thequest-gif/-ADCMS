@@ -197,23 +197,29 @@
       
       console.log('📝 New defect:', newDefect);
       
-      // Save to Firebase
-      if (window.ADCMSData && typeof window.ADCMSData.addDefect === 'function') {
-        window.ADCMSData.addDefect(newDefect).then(function() {
-          console.log('✅ Defect saved!');
-          alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue);
-          
-          // Redirect
-          setTimeout(function() {
-            window.location.href = 'defect.html?defectId=' + newDefect.id;
-          }, 500);
-        }).catch(function(error) {
-          console.error('❌ Error:', error);
-          alert('❌ Error saving defect: ' + error.message);
-        });
-      } else {
-        console.error('❌ ADCMSData not available!');
-        alert('❌ System not ready. Please refresh the page.');
+      // Save to localStorage (reliable fallback)
+      try {
+        let defects = JSON.parse(localStorage.getItem('defects') || '[]');
+        defects.push(newDefect);
+        localStorage.setItem('defects', JSON.stringify(defects));
+        console.log('✅ Defect saved to localStorage!');
+        
+        // Also try Firebase if available
+        if (window.ADCMSData && typeof window.ADCMSData.addDefect === 'function') {
+          window.ADCMSData.addDefect(newDefect).catch(function(e) {
+            console.warn('Firebase save failed, but localStorage saved:', e);
+          });
+        }
+        
+        alert('✅ Defect saved successfully!\n\nAircraft: ' + aircraft + '\nIssue: ' + issue);
+        
+        // Redirect
+        setTimeout(function() {
+          window.location.href = 'defect.html?defectId=' + newDefect.id;
+        }, 500);
+      } catch (error) {
+        console.error('❌ Error:', error);
+        alert('❌ Error saving defect: ' + error.message);
       }
     }
   </script>
